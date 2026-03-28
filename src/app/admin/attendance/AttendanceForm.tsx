@@ -4,7 +4,7 @@ import { useState } from "react";
 import { saveAttendanceAction } from "./actions";
 import { Check, X, Clock, HelpCircle } from "lucide-react";
 
-export default function AttendanceForm({ students, existingRecords, dateString, grade, section }: any) {
+export default function AttendanceForm({ students, existingRecords, dateString, grade, section, holidayEvent }: any) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   
@@ -43,6 +43,11 @@ export default function AttendanceForm({ students, existingRecords, dateString, 
   };
 
   const handleSubmit = async () => {
+    if (holidayEvent) {
+      alert(`Attendance is blocked because "${holidayEvent.title}" is marked as a holiday.`);
+      return;
+    }
+
     setIsSubmitting(true);
     setSuccess(false);
     
@@ -73,8 +78,8 @@ export default function AttendanceForm({ students, existingRecords, dateString, 
     <div>
       <div className="p-4 border-b border-gray-200 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-900/50 flex justify-end gap-2 text-sm">
         <span className="text-gray-500 dark:text-zinc-400 mr-2 flex items-center">Mark All:</span>
-        <button onClick={() => handleSetAll("Present")} className="px-3 py-1.5 rounded-md font-medium text-emerald-700 bg-emerald-100 hover:bg-emerald-200 dark:bg-emerald-500/20 dark:text-emerald-400 transition-colors">Present</button>
-        <button onClick={() => handleSetAll("Absent")} className="px-3 py-1.5 rounded-md font-medium text-red-700 bg-red-100 hover:bg-red-200 dark:bg-red-500/20 dark:text-red-400 transition-colors">Absent</button>
+        <button disabled={!!holidayEvent} onClick={() => handleSetAll("Present")} className="px-3 py-1.5 rounded-md font-medium text-emerald-700 bg-emerald-100 hover:bg-emerald-200 dark:bg-emerald-500/20 dark:text-emerald-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">Present</button>
+        <button disabled={!!holidayEvent} onClick={() => handleSetAll("Absent")} className="px-3 py-1.5 rounded-md font-medium text-red-700 bg-red-100 hover:bg-red-200 dark:bg-red-500/20 dark:text-red-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">Absent</button>
       </div>
       
       <div className="overflow-x-auto">
@@ -105,26 +110,30 @@ export default function AttendanceForm({ students, existingRecords, dateString, 
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-1.5 p-1 bg-gray-100/50 dark:bg-zinc-950/50 rounded-lg inline-flex border border-gray-200 dark:border-zinc-800">
                       <button 
+                        disabled={!!holidayEvent}
                         onClick={() => handleStatusChange(student._id, "Present")}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all shadow-sm ${getStatusClasses(currentStatus, "Present", "bg-white dark:bg-zinc-800 text-emerald-600 dark:text-emerald-400 shadow-md ring-1 ring-black/5 dark:ring-white/10")}`}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed ${getStatusClasses(currentStatus, "Present", "bg-white dark:bg-zinc-800 text-emerald-600 dark:text-emerald-400 shadow-md ring-1 ring-black/5 dark:ring-white/10")}`}
                       >
                         <Check size={14} /> Present
                       </button>
                       <button 
+                        disabled={!!holidayEvent}
                         onClick={() => handleStatusChange(student._id, "Absent")}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all shadow-sm ${getStatusClasses(currentStatus, "Absent", "bg-white dark:bg-zinc-800 text-red-600 dark:text-red-400 shadow-md ring-1 ring-black/5 dark:ring-white/10")}`}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed ${getStatusClasses(currentStatus, "Absent", "bg-white dark:bg-zinc-800 text-red-600 dark:text-red-400 shadow-md ring-1 ring-black/5 dark:ring-white/10")}`}
                       >
                         <X size={14} /> Absent
                       </button>
                       <button 
+                        disabled={!!holidayEvent}
                         onClick={() => handleStatusChange(student._id, "Late")}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all shadow-sm ${getStatusClasses(currentStatus, "Late", "bg-white dark:bg-zinc-800 text-amber-600 dark:text-amber-400 shadow-md ring-1 ring-black/5 dark:ring-white/10")}`}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed ${getStatusClasses(currentStatus, "Late", "bg-white dark:bg-zinc-800 text-amber-600 dark:text-amber-400 shadow-md ring-1 ring-black/5 dark:ring-white/10")}`}
                       >
                         <Clock size={14} /> Late
                       </button>
                       <button 
+                        disabled={!!holidayEvent}
                         onClick={() => handleStatusChange(student._id, "Excused")}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all shadow-sm ${getStatusClasses(currentStatus, "Excused", "bg-white dark:bg-zinc-800 text-blue-600 dark:text-blue-400 shadow-md ring-1 ring-black/5 dark:ring-white/10")}`}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed ${getStatusClasses(currentStatus, "Excused", "bg-white dark:bg-zinc-800 text-blue-600 dark:text-blue-400 shadow-md ring-1 ring-black/5 dark:ring-white/10")}`}
                       >
                         <HelpCircle size={14} /> Excused
                       </button>
@@ -143,10 +152,10 @@ export default function AttendanceForm({ students, existingRecords, dateString, 
         </div>
         <button 
           onClick={handleSubmit} 
-          disabled={isSubmitting}
+          disabled={isSubmitting || !!holidayEvent}
           className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-lg text-sm font-semibold bg-blue-600 text-white hover:bg-blue-500 h-10 px-8 transition-colors disabled:opacity-70 shadow-sm"
         >
-          {isSubmitting ? "Saving..." : "Save Daily Attendance"}
+          {holidayEvent ? "Attendance Disabled on Holiday" : isSubmitting ? "Saving..." : "Save Daily Attendance"}
         </button>
       </div>
     </div>

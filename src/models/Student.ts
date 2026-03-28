@@ -4,6 +4,8 @@ export interface IStudent extends Document {
   name: string;
   email: string;
   phone: string;
+  admissionNumber?: string;
+  rollNumber?: string;
   grade: string;
   section: string;
   status: "Active" | "Pending" | "Inactive";
@@ -28,6 +30,8 @@ const StudentSchema = new Schema<IStudent>(
     name: { type: String, required: true, trim: true },
     email: { type: String, required: true, unique: true, lowercase: true },
     phone: { type: String, required: true },
+    admissionNumber: { type: String, trim: true, uppercase: true, sparse: true, unique: true },
+    rollNumber: { type: String, trim: true, uppercase: true, sparse: true, unique: true },
     grade: { type: String, required: true },
     section: { type: String, required: true, default: "A" },
     status: {

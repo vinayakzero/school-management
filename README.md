@@ -30,7 +30,7 @@ A modern, high-performance School Management System built with the latest techno
 3. **Configure Environment Variables**:
    Create a `.env.local` file with the following:
    ```env
-   MONGODB_URI=mongodb+srv://vk_db_user:bJDjr4OvWNMXkNkF@vk0.ksj1gsp.mongodb.net/school-management
+   MONGODB_URI=mongodb+srv://<username>:<password>@<cluster-host>/skool
    ```
 
 4. **Run Development Server**:

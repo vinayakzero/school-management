@@ -2,6 +2,7 @@
 
 import connectDB from "@/lib/mongodb";
 import Attendance from "@/models/Attendance";
+import Event from "@/models/Event";
 import { revalidatePath } from "next/cache";
 
 export async function saveAttendanceAction(
@@ -16,6 +17,20 @@ export async function saveAttendanceAction(
     // Normalize date to midnight UTC to prevent tz mismatches determining attendance documents
     const rawDate = new Date(dateString);
     const date = new Date(Date.UTC(rawDate.getUTCFullYear(), rawDate.getUTCMonth(), rawDate.getUTCDate()));
+
+    const holidayEvent = await Event.findOne({
+      isHoliday: true,
+      startDate: { $lte: date },
+      endDate: { $gte: date },
+      $or: [{ grade: "" }, { grade }],
+    }).lean();
+
+    if (holidayEvent) {
+      return {
+        success: false,
+        error: `Attendance is blocked because "${holidayEvent.title}" is marked as a holiday on this date.`,
+      };
+    }
 
     const filter = { date, grade, section };
     const update = { records };

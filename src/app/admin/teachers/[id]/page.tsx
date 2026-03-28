@@ -4,20 +4,13 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Mail, Phone, MapPin, Calendar, User, BookOpen, DollarSign } from "lucide-react";
 import TeacherProfileActions from "./TeacherProfileActions";
-import mongoose from "mongoose";
 
 export const dynamic = 'force-dynamic';
 
 export default async function TeacherProfilePage({ params }: { params: { id: string } }) {
-  const { id } = params;
-
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    notFound();
-  }
-
   await connectDB();
 
-  const teacher = await Teacher.findById(id).lean();
+  const teacher = await Teacher.findById(params.id).lean();
   if (!teacher) notFound();
 
   const t = JSON.parse(JSON.stringify(teacher));
@@ -36,18 +29,17 @@ export default async function TeacherProfilePage({ params }: { params: { id: str
         <div className="px-6 pb-6">
           <div className="flex flex-col sm:flex-row sm:items-end gap-4 -mt-12">
             <div className="h-24 w-24 rounded-2xl bg-white dark:bg-zinc-800 border-4 border-white dark:border-zinc-900 shadow-lg flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-black text-3xl shrink-0">
-              {t.name ? t.name.split(" ").map((n: string) => n[0].replace(/[^a-zA-Z]/g, "")).join("").substring(0, 2) : "TC"}
+              {t.name ? t.name.split(" ").filter(Boolean).map((n: string) => n[0]?.toUpperCase()).join("").substring(0, 2) : "TC"}
             </div>
             <div className="flex-1 pb-1">
               <h1 className="text-2xl font-bold text-gray-900 dark:text-zinc-100">{t.name || "Unknown Teacher"}</h1>
-              <p className="text-gray-500 dark:text-zinc-400">{t.subject} · {t.experience} years experience · {t.gender}</p>
+              <p className="text-gray-500 dark:text-zinc-400">{t.subject || "Subject"} · {t.experience || 0} years experience · {t.gender || "Gender"}</p>
             </div>
             <div className="flex items-center gap-3 mt-2 sm:mt-0">
-              <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold border ${
-                t.status === "Active" ? "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20"
-                : t.status === "On Leave" ? "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20"
-                : "bg-gray-100 text-gray-700 border-gray-200 dark:bg-zinc-800 dark:text-zinc-400 dark:border-zinc-700"
-              }`}>
+              <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold border ${t.status === "Active" ? "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20"
+                  : t.status === "On Leave" ? "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20"
+                    : "bg-gray-100 text-gray-700 border-gray-200 dark:bg-zinc-800 dark:text-zinc-400 dark:border-zinc-700"
+                }`}>
                 {t.status}
               </span>
               <TeacherProfileActions teacher={t} />
