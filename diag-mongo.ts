@@ -23,7 +23,11 @@ async function test() {
   try {
     await mongoose.connect(uri, { serverSelectionTimeoutMS: 5000 });
     console.log("Connected successfully!");
-    const collections = await mongoose.connection.db.listCollections().toArray();
+    const db = mongoose.connection.db;
+    if (!db) {
+      throw new Error("Database connection not established");
+    }
+    const collections = await db.listCollections().toArray();
     console.log("Collections:", collections.map(c => c.name));
     await mongoose.disconnect();
     console.log("Disconnected.");
