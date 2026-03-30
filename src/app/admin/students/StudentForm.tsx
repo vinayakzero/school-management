@@ -80,6 +80,10 @@ export default function StudentForm({ student, backHref = "/admin/students" }: {
                   <input name="admissionNumber" type="text" required defaultValue={student?.admissionNumber} className={inputClass} placeholder="e.g. ADM-2026-0101" />
                 </div>
                 <div>
+                  <label className={labelClass}>Academic Session</label>
+                  <input name="academicSession" type="text" defaultValue={student?.academicSession || "2026-2027"} className={inputClass} placeholder="2026-2027" />
+                </div>
+                <div>
                   <label className={labelClass}>Date of Birth *</label>
                   <input name="dateOfBirth" type="date" required defaultValue={student?.dateOfBirth ? new Date(student.dateOfBirth).toISOString().split("T")[0] : ""} className={inputClass} />
                 </div>
@@ -93,6 +97,22 @@ export default function StudentForm({ student, backHref = "/admin/students" }: {
                 <div>
                   <label className={labelClass}>Address</label>
                   <input name="address" type="text" defaultValue={student?.address} className={inputClass} placeholder="123 Main St, City" />
+                </div>
+                <div>
+                  <label className={labelClass}>Admission Source</label>
+                  <input name="admissionSource" type="text" defaultValue={student?.admissionSource} className={inputClass} placeholder="Walk-in / Referral / Transfer" />
+                </div>
+                <div>
+                  <label className={labelClass}>Previous School</label>
+                  <input name="previousSchool" type="text" defaultValue={student?.previousSchool} className={inputClass} placeholder="Previous school name" />
+                </div>
+                <div>
+                  <label className={labelClass}>Blood Group</label>
+                  <input name="bloodGroup" type="text" defaultValue={student?.bloodGroup} className={inputClass} placeholder="e.g. O+" />
+                </div>
+                <div>
+                  <label className={labelClass}>House</label>
+                  <input name="house" type="text" defaultValue={student?.house} className={inputClass} placeholder="Red / Blue / Green / Yellow" />
                 </div>
               </div>
 
@@ -133,6 +153,18 @@ export default function StudentForm({ student, backHref = "/admin/students" }: {
                 <div>
                   <label className={labelClass}>Parent / Guardian Phone *</label>
                   <input name="parentPhone" type="text" required defaultValue={student?.parentPhone} className={inputClass} placeholder="555-0200" />
+                </div>
+                <div>
+                  <label className={labelClass}>Guardian Relation</label>
+                  <input name="guardianRelation" type="text" defaultValue={student?.guardianRelation} className={inputClass} placeholder="Father / Mother / Guardian" />
+                </div>
+                <div>
+                  <label className={labelClass}>Emergency Contact Name</label>
+                  <input name="emergencyContactName" type="text" defaultValue={student?.emergencyContactName} className={inputClass} placeholder="Emergency contact person" />
+                </div>
+                <div className="sm:col-span-2">
+                  <label className={labelClass}>Emergency Contact Phone</label>
+                  <input name="emergencyContactPhone" type="text" defaultValue={student?.emergencyContactPhone} className={inputClass} placeholder="Emergency contact phone" />
                 </div>
               </div>
             </div>

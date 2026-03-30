@@ -1,10 +1,26 @@
 import mongoose from "mongoose";
 
-const MONGODB_URI = process.env.MONGODB_URI || "";
+// Pre-register models to prevent "MissingSchemaError" in Next.js
+import "@/models/Student";
+import "@/models/Teacher";
+import "@/models/Class";
+import "@/models/Subject";
+import "@/models/Course";
+import "@/models/Syllabus";
+import "@/models/Exam";
+import "@/models/Result";
+import "@/models/Attendance";
+import "@/models/Event";
+import "@/models/FeeStructure";
+import "@/models/Payment";
+import "@/models/Setting";
+import "@/models/CertificateTemplate";
 
-if (!MONGODB_URI) {
+const DB_CONNECTION = process.env.DB_CONNECTION || "";
+
+if (!DB_CONNECTION) {
   throw new Error(
-    "Please define the MONGODB_URI environment variable inside .env.local"
+    "Please define the DB_CONNECTION environment variable inside .env.local"
   );
 }
 
@@ -24,7 +40,7 @@ async function connectDB() {
       bufferCommands: false,
     };
 
-    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
+    cached.promise = mongoose.connect(DB_CONNECTION, opts).then((mongoose) => {
       return mongoose;
     });
   }

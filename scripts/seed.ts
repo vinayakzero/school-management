@@ -1,3 +1,4 @@
+console.log(">>> LOADING SEED SCRIPT <<<");
 import mongoose from "mongoose";
 import Attendance from "../src/models/Attendance";
 import CertificateTemplate from "../src/models/CertificateTemplate";
@@ -13,12 +14,32 @@ import Student from "../src/models/Student";
 import Subject from "../src/models/Subject";
 import Syllabus from "../src/models/Syllabus";
 import Teacher from "../src/models/Teacher";
+import fs from "fs";
+import path from "path";
 
-const MONGODB_URI = process.env.MONGODB_URI;
+const DB_CONNECTION = process.env.DB_CONNECTION;
 
-if (!MONGODB_URI) {
-  throw new Error("Please define the MONGODB_URI environment variable inside .env.local");
+if (!DB_CONNECTION) {
+  // Try to load from .env.local manually if not provided by env-file flag
+  try {
+    const envPath = path.resolve(process.cwd(), ".env.local");
+    if (fs.existsSync(envPath)) {
+      const envContent = fs.readFileSync(envPath, "utf8");
+      const match = envContent.match(/^DB_CONNECTION=(.*)$/m);
+      if (match) {
+        process.env.DB_CONNECTION = match[1].trim();
+      }
+    }
+  } catch (e) {
+    // ignore
+  }
 }
+
+if (!process.env.DB_CONNECTION) {
+  throw new Error("Please define the DB_CONNECTION environment variable inside .env.local or your shell.");
+}
+
+const URI = process.env.DB_CONNECTION;
 
 const GRADES = Array.from({ length: 12 }, (_, index) => `Grade ${index + 1}`);
 const SECTIONS = ["A", "B"];
@@ -261,7 +282,10 @@ async function clearCollections() {
 
 async function seed() {
   try {
-    await mongoose.connect(MONGODB_URI);
+    console.log("Connecting to MongoDB...");
+    await mongoose.connect(URI, {
+      serverSelectionTimeoutMS: 10000,
+    });
     console.log("Connected to MongoDB -> 'skool' database");
 
     await clearCollections();

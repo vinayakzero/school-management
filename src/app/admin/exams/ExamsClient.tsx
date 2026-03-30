@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Search, Trash2, CalendarHeart, ClipboardEdit, Printer } from "lucide-react";
+import { Plus, Search, Trash2, CalendarHeart, ClipboardEdit, Printer, Pencil } from "lucide-react";
 import { deleteExamAction } from "./actions";
 import Link from "next/link";
 import { formatShortDate } from "@/lib/date";
@@ -102,6 +102,14 @@ export default function ExamsClient({ exams }: { exams: any[]; subjects: any[] }
                     </td>
                     <td className="flex items-center justify-end gap-2 px-6 py-4 text-right">
                       <div className="flex items-center gap-2 opacity-50 transition-opacity xl:opacity-0 group-hover:opacity-100">
+                        <Link
+                          href={`/admin/exams/${exam._id}/edit`}
+                          className="rounded-lg p-1.5 text-gray-500 transition-colors hover:bg-gray-50 hover:text-blue-600 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-blue-400"
+                          title="Edit Exam"
+                        >
+                          <Pencil size={18} />
+                        </Link>
+
                         <Link
                           href={`/admin/exams/${exam._id}`}
                           className="flex items-center gap-1.5 rounded-lg border border-blue-200 bg-blue-50 px-3 py-1.5 font-medium text-blue-600 transition-colors hover:bg-blue-100 dark:border-blue-500/20 dark:bg-blue-500/10 dark:text-blue-400 dark:hover:bg-blue-500/20"

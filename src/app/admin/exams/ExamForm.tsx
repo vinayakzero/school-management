@@ -4,13 +4,15 @@ import Link from "next/link";
 import { useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { addExamAction } from "./actions";
+import { addExamAction, updateExamAction } from "./actions";
 
 export default function ExamForm({
   subjects,
+  examToEdit,
   backHref = "/admin/exams",
 }: {
   subjects: any[];
+  examToEdit?: any;
   backHref?: string;
 }) {
   const router = useRouter();
@@ -33,9 +35,15 @@ export default function ExamForm({
     const [subId, grade, subName] = selected.split("|");
     formData.append("subjectId", subId);
     formData.append("grade", grade);
+    
+    // For editing, we might not want to force appending Suffix if name is already complete, 
+    // but the current model uses name as a separate field.
+    // If examToEdit is present, we interpret nameSuffix differently or use a dedicated name field.
     formData.append("name", `${subName} ${formData.get("nameSuffix")}`);
 
-    const res = await addExamAction(formData);
+    const res = examToEdit 
+      ? await updateExamAction(examToEdit._id, formData)
+      : await addExamAction(formData);
 
     if (res.success) {
       router.push("/admin/exams");
@@ -46,6 +54,12 @@ export default function ExamForm({
     }
   };
 
+  const defaultSubjectVal = examToEdit 
+    ? `${examToEdit.subject?._id || examToEdit.subject}|${examToEdit.grade}|${examToEdit.subject?.name || ""}` 
+    : "";
+  
+  const initialNameSuffix = examToEdit?.name?.replace(examToEdit.subject?.name || "", "").trim() || "";
+
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <div>
@@ -53,8 +67,12 @@ export default function ExamForm({
           <ArrowLeft size={16} />
           Back to Exams
         </Link>
-        <h1 className="mt-3 text-3xl font-bold text-gray-900 dark:text-zinc-100">Schedule New Exam</h1>
-        <p className="mt-1 text-sm text-gray-500 dark:text-zinc-400">Create exam records from a dedicated page instead of a popup.</p>
+        <h1 className="mt-3 text-3xl font-bold text-gray-900 dark:text-zinc-100">
+          {examToEdit ? "Edit Exam" : "Schedule New Exam"}
+        </h1>
+        <p className="mt-1 text-sm text-gray-500 dark:text-zinc-400">
+          {examToEdit ? `Updating details for ${examToEdit.name}` : "Create exam records from a dedicated page instead of a popup."}
+        </p>
       </div>
 
       <div className="rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
@@ -71,8 +89,9 @@ export default function ExamForm({
               <select
                 name="subjectSelection"
                 required
+                defaultValue={defaultSubjectVal}
                 className="w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-gray-900 transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
-                autoFocus
+                autoFocus={!examToEdit}
               >
                 <option value="">Select Target Subject...</option>
                 {subjects.map(sub => (
@@ -84,11 +103,12 @@ export default function ExamForm({
             </div>
 
             <div>
-              <label className="mb-1.5 block font-semibold text-gray-700 dark:text-zinc-300">Exam Term / Name *</label>
+              <label className="mb-1.5 block font-semibold text-gray-700 dark:text-zinc-300">Exam Term / Name Suffix *</label>
               <input
                 type="text"
                 name="nameSuffix"
                 required
+                defaultValue={initialNameSuffix}
                 placeholder="e.g. Midterm 2024"
                 className="w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-gray-900 transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
               />
@@ -102,6 +122,7 @@ export default function ExamForm({
                   type="date"
                   name="date"
                   required
+                  defaultValue={examToEdit?.date ? new Date(examToEdit.date).toISOString().split("T")[0] : ""}
                   className="w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-gray-900 transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
                 />
               </div>
@@ -114,7 +135,7 @@ export default function ExamForm({
                   required
                   min={10}
                   max={100}
-                  defaultValue={100}
+                  defaultValue={examToEdit?.totalMarks || 100}
                   className="w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-gray-900 transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
                 />
               </div>
@@ -125,7 +146,7 @@ export default function ExamForm({
                 Cancel
               </Link>
               <button type="submit" disabled={loading} className="flex-1 rounded-xl bg-blue-600 px-4 py-2.5 font-semibold text-white transition-all active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70 hover:bg-blue-700">
-                {loading ? "Saving..." : "Create Exam"}
+                {loading ? "Saving..." : examToEdit ? "Update Exam" : "Create Exam"}
               </button>
             </div>
           </form>

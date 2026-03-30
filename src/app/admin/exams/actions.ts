@@ -42,6 +42,42 @@ export async function addExamAction(formData: FormData) {
   }
 }
 
+export async function updateExamAction(id: string, formData: FormData) {
+  try {
+    await connectDB();
+    
+    const subjectId = formData.get("subjectId")?.toString();
+    const grade = formData.get("grade")?.toString();
+    
+    if (!subjectId || !grade) {
+      return { success: false, error: "Subject ID and Grade are required." };
+    }
+
+    const data = {
+      name: formData.get("name")?.toString(),
+      subject: subjectId,
+      grade: grade,
+      date: formData.get("date")?.toString(),
+      totalMarks: Number(formData.get("totalMarks")) || 100,
+    };
+
+    const updatedExam = await Exam.findByIdAndUpdate(id, data, { new: true });
+    if (!updatedExam) return { success: false, error: "Exam not found." };
+    
+    await syncExamEvent(id);
+    
+    revalidatePath("/admin/exams");
+    revalidatePath(`/admin/exams/${id}`);
+    revalidatePath("/admin/calendar");
+    return { success: true };
+  } catch (error: any) {
+    if (error.code === 11000) {
+      return { success: false, error: "An exam with this name already exists for this subject on this date." };
+    }
+    return { success: false, error: error.message };
+  }
+}
+
 export async function deleteExamAction(id: string) {
   try {
     await connectDB();

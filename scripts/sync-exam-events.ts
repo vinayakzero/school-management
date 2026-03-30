@@ -2,17 +2,38 @@ import mongoose from "mongoose";
 import Exam from "../src/models/Exam";
 import Event from "../src/models/Event";
 import { syncExamEvent } from "../src/lib/calendar";
+import fs from "fs";
+import path from "path";
 
-const MONGODB_URI = process.env.MONGODB_URI;
+let DB_CONNECTION = process.env.DB_CONNECTION;
 
-if (!MONGODB_URI) {
-  throw new Error("MONGODB_URI environment variable is required.");
+if (!DB_CONNECTION) {
+  try {
+    const envPath = path.resolve(process.cwd(), ".env.local");
+    if (fs.existsSync(envPath)) {
+      const envContent = fs.readFileSync(envPath, "utf8");
+      const match = envContent.match(/^DB_CONNECTION=(.*)$/m);
+      if (match) {
+        process.env.DB_CONNECTION = match[1].trim();
+        DB_CONNECTION = process.env.DB_CONNECTION;
+      }
+    }
+  } catch (e) {
+    // ignore
+  }
+}
+
+if (!DB_CONNECTION) {
+  throw new Error("DB_CONNECTION environment variable is required in .env.local or shell.");
 }
 
 async function run() {
   try {
-    await mongoose.connect(MONGODB_URI);
-    console.log("Connected to MongoDB");
+    console.log("Connecting to MongoDB for exam sync...");
+    await mongoose.connect(DB_CONNECTION, {
+      serverSelectionTimeoutMS: 10000,
+    });
+    console.log("Connected successfully.");
 
     const exams = await Exam.find().select("_id").lean();
     let synced = 0;
