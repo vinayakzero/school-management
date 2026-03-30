@@ -27,10 +27,12 @@ if (!DB_CONNECTION) {
   throw new Error("DB_CONNECTION environment variable is required in .env.local or shell.");
 }
 
+const connectionString: string = DB_CONNECTION;
+
 async function run() {
   try {
     console.log("Connecting to MongoDB for exam sync...");
-    await mongoose.connect(DB_CONNECTION, {
+    await mongoose.connect(connectionString, {
       serverSelectionTimeoutMS: 10000,
     });
     console.log("Connected successfully.");
