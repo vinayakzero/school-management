@@ -1,6 +1,9 @@
 console.log(">>> LOADING SEED SCRIPT <<<");
 import mongoose from "mongoose";
+import { getDefaultApplicationChecklist } from "../src/lib/admissions";
+import AdmissionApplication from "../src/models/AdmissionApplication";
 import Attendance from "../src/models/Attendance";
+import AdmissionInquiry from "../src/models/AdmissionInquiry";
 import CertificateTemplate from "../src/models/CertificateTemplate";
 import ClassModel from "../src/models/Class";
 import Course from "../src/models/Course";
@@ -17,7 +20,7 @@ import Teacher from "../src/models/Teacher";
 import fs from "fs";
 import path from "path";
 
-const DB_CONNECTION = process.env.DB_CONNECTION;
+const DB_CONNECTION = process.env.DB_CONNECTION || process.env.MONGODB_URI;
 
 if (!DB_CONNECTION) {
   // Try to load from .env.local manually if not provided by env-file flag
@@ -25,9 +28,9 @@ if (!DB_CONNECTION) {
     const envPath = path.resolve(process.cwd(), ".env.local");
     if (fs.existsSync(envPath)) {
       const envContent = fs.readFileSync(envPath, "utf8");
-      const match = envContent.match(/^DB_CONNECTION=(.*)$/m);
+      const match = envContent.match(/^(DB_CONNECTION|MONGODB_URI)=(.*)$/m);
       if (match) {
-        process.env.DB_CONNECTION = match[1].trim();
+        process.env.DB_CONNECTION = match[2].trim();
       }
     }
   } catch (e) {
@@ -35,11 +38,11 @@ if (!DB_CONNECTION) {
   }
 }
 
-if (!process.env.DB_CONNECTION) {
-  throw new Error("Please define the DB_CONNECTION environment variable inside .env.local or your shell.");
+if (!process.env.DB_CONNECTION && !process.env.MONGODB_URI) {
+  throw new Error("Please define DB_CONNECTION (preferred) or MONGODB_URI inside .env.local or your shell.");
 }
 
-const URI = process.env.DB_CONNECTION;
+const URI = (process.env.DB_CONNECTION || process.env.MONGODB_URI) as string;
 
 const GRADES = Array.from({ length: 12 }, (_, index) => `Grade ${index + 1}`);
 const SECTIONS = ["A", "B"];
@@ -261,9 +264,105 @@ function buildCertificateTemplates() {
   ];
 }
 
+function buildAdmissionInquiries() {
+  return [
+    {
+      parentName: "Ritika Mehta",
+      studentName: "Ira Mehta",
+      studentGradeInterest: "Grade 2",
+      email: "ritika.mehta@example.com",
+      phone: "+91 98180 44221",
+      message: "We are exploring a mid-session move and would like to understand classroom support and reading culture.",
+      requestType: "Admission Inquiry",
+      status: "New",
+      sourcePage: "admissions",
+      sourcePath: "/admissions",
+      followUpDate: new Date("2026-04-04"),
+    },
+    {
+      parentName: "Anirudh Shah",
+      studentName: "Veer Shah",
+      studentGradeInterest: "Grade 6",
+      email: "anirudh.shah@example.com",
+      phone: "+91 99092 11334",
+      message: "Interested in academics and sports balance. Would prefer a morning campus visit next week.",
+      requestType: "Campus Visit",
+      status: "Visit Requested",
+      sourcePage: "campus",
+      sourcePath: "/campus",
+      preferredVisitDate: new Date("2026-04-08"),
+      preferredVisitTime: "Morning",
+      followUpDate: new Date("2026-04-05"),
+    },
+    {
+      parentName: "Farah Khan",
+      studentName: "Ayaan Khan",
+      studentGradeInterest: "Grade 9",
+      email: "farah.khan@example.com",
+      phone: "+91 99871 33210",
+      message: "Would like details about senior school subject pathways and science labs.",
+      requestType: "Admission Inquiry",
+      status: "Contacted",
+      sourcePage: "admissions",
+      sourcePath: "/admissions",
+      followUpDate: new Date("2026-04-06"),
+      internalNotes: "Introductory call completed. Family requested brochure and subject pathway note.",
+      lastContactedAt: new Date("2026-04-02"),
+    },
+    {
+      parentName: "Karan Bedi",
+      studentName: "Myra Bedi",
+      studentGradeInterest: "Nursery",
+      email: "karan.bedi@example.com",
+      phone: "+91 98731 22019",
+      message: "Looking for early years admission for 2026-27 and would like to visit with both parents.",
+      requestType: "Campus Visit",
+      status: "Visit Scheduled",
+      sourcePage: "campus",
+      sourcePath: "/campus",
+      preferredVisitDate: new Date("2026-04-10"),
+      preferredVisitTime: "11:00 AM",
+      followUpDate: new Date("2026-04-10"),
+      internalNotes: "Visit confirmed by phone. Reception team informed.",
+      lastContactedAt: new Date("2026-04-03"),
+    },
+    {
+      parentName: "Neha Iyer",
+      studentName: "Rohan Iyer",
+      studentGradeInterest: "Grade 11",
+      email: "neha.iyer@example.com",
+      phone: "+91 98202 44331",
+      message: "Family is evaluating commerce stream options and wants to discuss board prep support.",
+      requestType: "Admission Inquiry",
+      status: "Application Started",
+      sourcePage: "admissions",
+      sourcePath: "/admissions",
+      followUpDate: new Date("2026-04-07"),
+      internalNotes: "Application checklist shared. Waiting on academic records.",
+      lastContactedAt: new Date("2026-04-03"),
+    },
+    {
+      parentName: "Samarjeet Singh",
+      studentName: "Kabir Singh",
+      studentGradeInterest: "Grade 4",
+      email: "samarjeet.singh@example.com",
+      phone: "+91 99584 12048",
+      message: "Family has decided to remain with current school for this year.",
+      requestType: "Admission Inquiry",
+      status: "Closed",
+      sourcePage: "admissions",
+      sourcePath: "/admissions",
+      internalNotes: "Lead closed after family decision. Reconnect next academic year if requested.",
+      lastContactedAt: new Date("2026-04-01"),
+    },
+  ];
+}
+
 async function clearCollections() {
   await Promise.all([
     Attendance.deleteMany({}),
+    AdmissionApplication.deleteMany({}),
+    AdmissionInquiry.deleteMany({}),
     CertificateTemplate.deleteMany({}),
     ClassModel.deleteMany({}),
     Course.deleteMany({}),
@@ -278,6 +377,56 @@ async function clearCollections() {
     Syllabus.deleteMany({}),
     Teacher.deleteMany({}),
   ]);
+}
+
+function buildAdmissionApplications(inquiries: any[]) {
+  const inquiryByEmail = new Map(inquiries.map((inquiry) => [inquiry.email, inquiry]));
+
+  return [
+    {
+      inquiry: inquiryByEmail.get("neha.iyer@example.com")?._id,
+      applicationNumber: "APP-2026-0001",
+      academicYear: ACADEMIC_YEAR,
+      status: "Documents Pending",
+      parentName: "Neha Iyer",
+      studentName: "Rohan Iyer",
+      studentGradeInterest: "Grade 11",
+      email: "neha.iyer@example.com",
+      phone: "+91 98202 44331",
+      applicationNotes: "Family is evaluating commerce stream options and prefers a guided onboarding discussion.",
+      counselorNotes: "Academic records requested. Follow up after Grade 10 pre-board result card is shared.",
+      reviewDate: new Date("2026-04-08"),
+      documentChecklist: getDefaultApplicationChecklist().map((item) => {
+        if (item.key === "birth-certificate" || item.key === "parent-id") {
+          return { ...item, status: "Verified", note: "Shared on email and cleared by admissions desk." };
+        }
+        if (item.key === "academic-records") {
+          return { ...item, status: "Received", note: "Awaiting counselor review." };
+        }
+        return item;
+      }),
+    },
+    {
+      inquiry: inquiryByEmail.get("karan.bedi@example.com")?._id,
+      applicationNumber: "APP-2026-0002",
+      academicYear: ACADEMIC_YEAR,
+      status: "Review Scheduled",
+      parentName: "Karan Bedi",
+      studentName: "Myra Bedi",
+      studentGradeInterest: "Nursery",
+      email: "karan.bedi@example.com",
+      phone: "+91 98731 22019",
+      applicationNotes: "Family completed the campus visit and requested an early years onboarding slot.",
+      counselorNotes: "Interaction with parents scheduled after campus walkthrough. Keep reception aligned for April intake discussion.",
+      reviewDate: new Date("2026-04-11"),
+      documentChecklist: getDefaultApplicationChecklist().map((item) => {
+        if (item.key === "photos") {
+          return { ...item, status: "Received", note: "Photos submitted at reception." };
+        }
+        return item;
+      }),
+    },
+  ].filter((application) => application.inquiry);
 }
 
 async function seed() {
@@ -641,6 +790,12 @@ async function seed() {
     ]);
     console.log(`Inserted ${eventDocs.length} events`);
 
+    const admissionInquiries = await AdmissionInquiry.insertMany(buildAdmissionInquiries());
+    console.log(`Inserted ${admissionInquiries.length} admissions inquiries`);
+
+    const admissionApplications = await AdmissionApplication.insertMany(buildAdmissionApplications(admissionInquiries));
+    console.log(`Inserted ${admissionApplications.length} admissions applications`);
+
     const certificateTemplates = await CertificateTemplate.insertMany(buildCertificateTemplates());
     console.log(`Inserted ${certificateTemplates.length} certificate/print templates`);
 
@@ -659,6 +814,8 @@ async function seed() {
     console.log(`- Results: ${results.length}`);
     console.log(`- Attendance sheets: ${attendance.length}`);
     console.log(`- Events: ${eventDocs.length}`);
+    console.log(`- Admissions inquiries: ${admissionInquiries.length}`);
+    console.log(`- Admissions applications: ${admissionApplications.length}`);
     console.log(`- Templates: ${certificateTemplates.length}`);
     console.log("");
     console.log("Seed completed successfully.");

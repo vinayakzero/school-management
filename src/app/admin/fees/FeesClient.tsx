@@ -5,6 +5,11 @@ import { useMemo, useState } from "react";
 import { CreditCard, FileText, Filter, Landmark, Pencil, Plus, Receipt, Search, ShieldCheck, Trash2, Wallet } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { deleteFeeStructureAction, deletePaymentAction } from "./actions";
+import { AdminPageHeader } from "@/components/admin/page-header";
+import { AdminMetricCard } from "@/components/admin/metric-card";
+import { buttonVariants } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
 
 function formatMoney(amount: number, currencySymbol: string) {
   return `${currencySymbol}${amount.toLocaleString()}`;
@@ -74,36 +79,32 @@ export default function FeesClient({
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Fee Management</h1>
-          <p className="mt-1 text-sm text-gray-500 dark:text-zinc-400">
-            Manage fee structures, concessions, installment receipts, and daily cash-office visibility.
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-3">
-          <Link href="/admin/fees/structures/new" className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700">
-            <Plus size={16} />
-            Add Fee Structure
-          </Link>
-          <Link href="/admin/fees/payments/new" className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-700">
-            <Wallet size={16} />
-            Record Payment
-          </Link>
-          <Link href="/admin/fees/daily-collection" className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800">
-            <Landmark size={16} />
-            Daily Collection
-          </Link>
-        </div>
-      </div>
+      <AdminPageHeader
+        eyebrow="Core Admin Surface"
+        title="Fee Office"
+        description="Manage fee structures, collections, concessions, and receipt-ready office workflows from a single finance surface."
+      >
+        <Link href="/admin/fees/structures/new" className={buttonVariants({ variant: "default" })}>
+          <Plus size={16} />
+          Add Fee Structure
+        </Link>
+        <Link href="/admin/fees/payments/new" className={buttonVariants({ variant: "success" })}>
+          <Wallet size={16} />
+          Record Payment
+        </Link>
+        <Link href="/admin/fees/daily-collection" className={buttonVariants({ variant: "outline" })}>
+          <Landmark size={16} />
+          Daily Collection
+        </Link>
+      </AdminPageHeader>
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-6">
-        <SummaryCard icon={<FileText className="h-5 w-5 text-blue-600" />} label="Assigned Fees" value={formatMoney(summary.totalAssigned, currencySymbol)} tone="blue" />
-        <SummaryCard icon={<CreditCard className="h-5 w-5 text-emerald-600" />} label="Credited" value={formatMoney(summary.totalCollected, currencySymbol)} tone="emerald" />
-        <SummaryCard icon={<Receipt className="h-5 w-5 text-amber-600" />} label="Outstanding" value={formatMoney(summary.totalOutstanding, currencySymbol)} tone="amber" />
-        <SummaryCard icon={<Wallet className="h-5 w-5 text-violet-600" />} label="Fully Paid" value={summary.fullyPaidCount.toString()} tone="violet" />
-        <SummaryCard icon={<ShieldCheck className="h-5 w-5 text-sky-600" />} label="Waived" value={formatMoney(summary.totalWaived, currencySymbol)} tone="sky" />
-        <SummaryCard icon={<Landmark className="h-5 w-5 text-rose-600" />} label="Fine Collected" value={formatMoney(summary.totalFine, currencySymbol)} tone="rose" />
+        <AdminMetricCard icon={<FileText className="h-5 w-5" />} label="Assigned Fees" value={formatMoney(summary.totalAssigned, currencySymbol)} tone="primary" />
+        <AdminMetricCard icon={<CreditCard className="h-5 w-5" />} label="Credited" value={formatMoney(summary.totalCollected, currencySymbol)} tone="emerald" />
+        <AdminMetricCard icon={<Receipt className="h-5 w-5" />} label="Outstanding" value={formatMoney(summary.totalOutstanding, currencySymbol)} tone="amber" />
+        <AdminMetricCard icon={<Wallet className="h-5 w-5" />} label="Fully Paid" value={summary.fullyPaidCount.toString()} tone="violet" />
+        <AdminMetricCard icon={<ShieldCheck className="h-5 w-5" />} label="Waived" value={formatMoney(summary.totalWaived, currencySymbol)} tone="sky" />
+        <AdminMetricCard icon={<Landmark className="h-5 w-5" />} label="Fine Collected" value={formatMoney(summary.totalFine, currencySymbol)} tone="rose" />
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[1.6fr_1fr]">
@@ -118,25 +119,25 @@ export default function FeesClient({
             <div className="flex flex-col gap-3 sm:flex-row">
               <div className="relative">
                 <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-                <input
+                <Input
                   value={searchTerm}
                   onChange={(event) => setSearchTerm(event.target.value)}
                   placeholder="Search student..."
-                  className="w-full rounded-xl border border-gray-200 bg-gray-50 py-2.5 pl-9 pr-4 text-sm text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
+                  className="bg-gray-50 pl-9 dark:bg-zinc-950"
                 />
               </div>
               <div className="relative">
                 <Filter className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-                <select
+                <Select
                   value={statusFilter}
                   onChange={(event) => setStatusFilter(event.target.value)}
-                  className="rounded-xl border border-gray-200 bg-gray-50 py-2.5 pl-9 pr-10 text-sm text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-100"
+                  className="bg-gray-50 pl-9 pr-10 dark:bg-zinc-950"
                 >
                   <option value="all">All statuses</option>
                   <option value="paid">Paid</option>
                   <option value="partial">Partial</option>
                   <option value="unpaid">Unpaid</option>
-                </select>
+                </Select>
               </div>
             </div>
           </div>
@@ -359,27 +360,6 @@ export default function FeesClient({
           </div>
         </section>
       </div>
-    </div>
-  );
-}
-
-function SummaryCard({ icon, label, value, tone }: { icon: React.ReactNode; label: string; value: string; tone: "blue" | "emerald" | "amber" | "violet" | "sky" | "rose" }) {
-  const tones = {
-    blue: "from-blue-50 to-white dark:from-blue-500/10 dark:to-zinc-900",
-    emerald: "from-emerald-50 to-white dark:from-emerald-500/10 dark:to-zinc-900",
-    amber: "from-amber-50 to-white dark:from-amber-500/10 dark:to-zinc-900",
-    violet: "from-violet-50 to-white dark:from-violet-500/10 dark:to-zinc-900",
-    sky: "from-sky-50 to-white dark:from-sky-500/10 dark:to-zinc-900",
-    rose: "from-rose-50 to-white dark:from-rose-500/10 dark:to-zinc-900",
-  };
-
-  return (
-    <div className={`rounded-2xl border border-gray-200 bg-gradient-to-br p-5 shadow-sm dark:border-zinc-800 ${tones[tone]}`}>
-      <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-white shadow-sm dark:bg-zinc-900">
-        {icon}
-      </div>
-      <p className="text-sm font-medium text-gray-500 dark:text-zinc-400">{label}</p>
-      <p className="mt-1 text-2xl font-bold text-gray-900 dark:text-zinc-100">{value}</p>
     </div>
   );
 }

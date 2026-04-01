@@ -5,6 +5,8 @@ import mongoose from "mongoose";
 import connectDB from "@/lib/mongodb";
 import Student from "@/models/Student";
 import CertificateTemplate from "@/models/CertificateTemplate";
+import { AdminPageHeader } from "@/components/admin/page-header";
+import { buttonVariants } from "@/components/ui/button";
 
 export const dynamic = "force-dynamic";
 
@@ -74,21 +76,16 @@ export default async function StudentDocumentsPage({ params }: { params: { id: s
 
   return (
     <div className="mx-auto max-w-6xl space-y-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <Link
-            href={`/admin/students/${student._id}`}
-            className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 transition-colors hover:text-blue-600 dark:text-zinc-400 dark:hover:text-blue-400"
-          >
-            <ArrowLeft size={16} />
-            Back to Student Profile
-          </Link>
-          <h1 className="mt-3 text-3xl font-bold text-gray-900 dark:text-white">Student Documents</h1>
-          <p className="mt-2 text-sm text-gray-500 dark:text-zinc-400">
-            Generate printable school documents for {student.name} ({student.grade} - Section {student.section}).
-          </p>
-        </div>
-      </div>
+      <AdminPageHeader
+        eyebrow="Print Entry Point"
+        title="Student Documents"
+        description={`Generate printable school documents for ${student.name} (${student.grade} - Section ${student.section}).`}
+      >
+        <Link href={`/admin/students/${student._id}`} className={buttonVariants({ variant: "outline" })}>
+          <ArrowLeft size={16} />
+          Back to Student Profile
+        </Link>
+      </AdminPageHeader>
 
       <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
         <div className="flex flex-wrap items-center gap-3">

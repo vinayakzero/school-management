@@ -108,7 +108,7 @@ export default async function StudentResultsPage({ params }: { params: { id: str
           <div className="text-center py-12 px-4 rounded-2xl border border-dashed border-gray-300 dark:border-zinc-700 bg-gray-50/50 dark:bg-zinc-800/20">
             <BookOpen className="mx-auto text-gray-400 dark:text-zinc-600 mb-3" size={32} />
             <h3 className="text-lg font-semibold text-gray-900 dark:text-zinc-300">No Grades Recorded</h3>
-            <p className="text-gray-500 mt-2 text-sm max-w-sm mx-auto">This student hasn't been graded for any exams currently on record.</p>
+            <p className="text-gray-500 mt-2 text-sm max-w-sm mx-auto">This student hasn&apos;t been graded for any exams currently on record.</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -131,7 +131,7 @@ export default async function StudentResultsPage({ params }: { params: { id: str
                       Subject: <span className="text-gray-900 dark:text-zinc-200">{subject?.name || "N/A"} ({subject?.code || "N/A"})</span>
                     </p>
                     {result.remarks && (
-                      <p className="text-sm italic text-gray-500 dark:text-zinc-500 mt-2">"{result.remarks}"</p>
+                      <p className="text-sm italic text-gray-500 dark:text-zinc-500 mt-2">&ldquo;{result.remarks}&rdquo;</p>
                     )}
                   </div>
                   

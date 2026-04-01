@@ -2,6 +2,7 @@ import Link from "next/link";
 import connectDB from "@/lib/mongodb";
 import Payment from "@/models/Payment";
 import Setting from "@/models/Setting";
+import { PrintPageLayout } from "@/components/admin/print-layout";
 
 export const dynamic = "force-dynamic";
 
@@ -49,37 +50,35 @@ export default async function DailyCollectionPage({
   );
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <Link href="/admin/fees" className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 transition-colors hover:text-blue-600 dark:text-zinc-400 dark:hover:text-blue-400">
-            Back to Fees
-          </Link>
-          <h1 className="mt-3 text-3xl font-bold text-gray-900 dark:text-zinc-100">Daily Cash Collection</h1>
-          <p className="mt-1 text-sm text-gray-500 dark:text-zinc-400">
-            Office-day summary for receipts, concessions, and fine handling. Use browser print for a hard copy.
-          </p>
-        </div>
-        <form className="flex flex-wrap gap-3">
-          <input
-            type="date"
-            name="date"
-            defaultValue={iso}
-            className="rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
-          />
-          <button type="submit" className="rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700">
-            Load Date
-          </button>
-        </form>
-      </div>
-
-      <div className="rounded-3xl border border-gray-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-        <div className="border-b border-gray-200 bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-8 text-white dark:border-zinc-800">
-          <p className="text-sm font-semibold uppercase tracking-[0.3em] text-white/70">Daily Collection Sheet</p>
-          <h2 className="mt-3 text-3xl font-black">{schoolName}</h2>
-          <p className="mt-2 text-sm text-white/80">
-            {new Date(start).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
-          </p>
+    <PrintPageLayout
+      backHref="/admin/fees"
+      backLabel="Back to Fees"
+      eyebrow="Daily Collection Sheet"
+      title={schoolName}
+      subtitle={new Date(start).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+      note="Use browser print for a hard copy."
+    >
+      <>
+        <div className="border-b border-gray-200 px-8 py-6 dark:border-zinc-800">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-zinc-100">Daily Cash Collection</h2>
+              <p className="mt-1 text-sm text-gray-500 dark:text-zinc-400">
+                Office-day summary for receipts, concessions, and fine handling.
+              </p>
+            </div>
+            <form className="flex flex-wrap gap-3">
+              <input
+                type="date"
+                name="date"
+                defaultValue={iso}
+                className="rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+              />
+              <button type="submit" className="rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700">
+                Load Date
+              </button>
+            </form>
+          </div>
         </div>
 
         <div className="grid gap-4 border-b border-gray-200 px-8 py-6 md:grid-cols-3 xl:grid-cols-6 dark:border-zinc-800">
@@ -138,8 +137,8 @@ export default async function DailyCollectionPage({
             </tbody>
           </table>
         </div>
-      </div>
-    </div>
+      </>
+    </PrintPageLayout>
   );
 }
 

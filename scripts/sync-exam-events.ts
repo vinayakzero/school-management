@@ -5,16 +5,16 @@ import { syncExamEvent } from "../src/lib/calendar";
 import fs from "fs";
 import path from "path";
 
-let DB_CONNECTION = process.env.DB_CONNECTION;
+let DB_CONNECTION = process.env.DB_CONNECTION || process.env.MONGODB_URI;
 
 if (!DB_CONNECTION) {
   try {
     const envPath = path.resolve(process.cwd(), ".env.local");
     if (fs.existsSync(envPath)) {
       const envContent = fs.readFileSync(envPath, "utf8");
-      const match = envContent.match(/^DB_CONNECTION=(.*)$/m);
+      const match = envContent.match(/^(DB_CONNECTION|MONGODB_URI)=(.*)$/m);
       if (match) {
-        process.env.DB_CONNECTION = match[1].trim();
+        process.env.DB_CONNECTION = match[2].trim();
         DB_CONNECTION = process.env.DB_CONNECTION;
       }
     }
@@ -24,7 +24,7 @@ if (!DB_CONNECTION) {
 }
 
 if (!DB_CONNECTION) {
-  throw new Error("DB_CONNECTION environment variable is required in .env.local or shell.");
+  throw new Error("DB_CONNECTION (preferred) or MONGODB_URI is required in .env.local or shell.");
 }
 
 const connectionString: string = DB_CONNECTION;

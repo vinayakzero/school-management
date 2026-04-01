@@ -3,19 +3,150 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: 210 33% 98%;
+  --foreground: 219 39% 14%;
+  --card: 0 0% 100%;
+  --card-foreground: 219 39% 14%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 219 39% 14%;
+  --primary: 210 78% 34%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 208 32% 93%;
+  --secondary-foreground: 217 33% 18%;
+  --muted: 210 30% 95%;
+  --muted-foreground: 215 16% 43%;
+  --accent: 205 61% 93%;
+  --accent-foreground: 214 50% 24%;
+  --destructive: 0 72% 48%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 210 21% 86%;
+  --input: 210 21% 86%;
+  --ring: 210 78% 34%;
+  --radius: 1rem;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: 220 39% 9%;
+    --foreground: 210 40% 96%;
+    --card: 222 31% 13%;
+    --card-foreground: 210 40% 96%;
+    --popover: 222 31% 13%;
+    --popover-foreground: 210 40% 96%;
+    --primary: 204 87% 62%;
+    --primary-foreground: 222 47% 11%;
+    --secondary: 217 25% 18%;
+    --secondary-foreground: 210 40% 96%;
+    --muted: 218 23% 16%;
+    --muted-foreground: 215 20% 69%;
+    --accent: 217 25% 18%;
+    --accent-foreground: 210 40% 96%;
+    --destructive: 0 63% 54%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217 20% 24%;
+    --input: 217 20% 24%;
+    --ring: 204 87% 62%;
   }
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-sans), sans-serif;
+  }
+
+  code,
+  pre,
+  kbd,
+  samp {
+    font-family: var(--font-mono), monospace;
+  }
+
+  ::selection {
+    background: hsl(var(--primary) / 0.18);
+    color: hsl(var(--foreground));
+  }
+}
+
+@layer components {
+  .public-theme {
+    background:
+      radial-gradient(circle at top, rgba(211, 183, 130, 0.2), transparent 28%),
+      radial-gradient(circle at 85% 12%, rgba(20, 52, 88, 0.16), transparent 32%),
+      linear-gradient(180deg, #f5efe4 0%, #efe8db 48%, #f8f5ef 100%);
+    color: #172033;
+  }
+
+  .public-theme::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(rgba(23, 32, 51, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(23, 32, 51, 0.03) 1px, transparent 1px);
+    background-size: 42px 42px;
+    mask-image: linear-gradient(180deg, rgba(255, 255, 255, 0.65), transparent 82%);
+    opacity: 0.45;
+  }
+
+  .public-shell-line {
+    position: relative;
+  }
+
+  .public-shell-line::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 1px;
+    background: linear-gradient(180deg, rgba(16, 38, 67, 0.4), rgba(16, 38, 67, 0));
+    opacity: 0.55;
+  }
+
+  .public-glass {
+    background: linear-gradient(180deg, rgba(8, 18, 33, 0.7), rgba(8, 18, 33, 0.48));
+    backdrop-filter: blur(18px);
+  }
+
+  .public-card {
+    background: linear-gradient(180deg, rgba(255, 253, 248, 0.9), rgba(248, 244, 235, 0.82));
+    box-shadow: 0 28px 70px -42px rgba(15, 23, 42, 0.38);
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  @layer components {
+    .public-theme {
+      background:
+        radial-gradient(circle at top, rgba(211, 183, 130, 0.08), transparent 24%),
+        radial-gradient(circle at 85% 12%, rgba(96, 165, 250, 0.1), transparent 32%),
+        linear-gradient(180deg, #08111f 0%, #0d1728 48%, #08101c 100%);
+      color: #e8edf5;
+    }
+
+    .public-theme::before {
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    }
+
+    .public-shell-line::after {
+      background: linear-gradient(180deg, rgba(190, 210, 235, 0.45), rgba(190, 210, 235, 0));
+    }
+
+    .public-card {
+      background: linear-gradient(180deg, rgba(10, 21, 38, 0.9), rgba(12, 24, 42, 0.78));
+      box-shadow: 0 28px 70px -42px rgba(8, 15, 31, 0.72);
+    }
+  }
 }

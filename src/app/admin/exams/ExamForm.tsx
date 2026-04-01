@@ -5,6 +5,8 @@ import { useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { addExamAction, updateExamAction } from "./actions";
+import { AdminPageHeader } from "@/components/admin/page-header";
+import { buttonVariants } from "@/components/ui/button";
 
 export default function ExamForm({
   subjects,
@@ -62,18 +64,16 @@ export default function ExamForm({
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <div>
-        <Link href={backHref} className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 transition-colors hover:text-blue-600 dark:text-zinc-400 dark:hover:text-blue-400">
+      <AdminPageHeader
+        eyebrow="Route-Based Workflow"
+        title={examToEdit ? "Edit Exam" : "Schedule New Exam"}
+        description={examToEdit ? `Update details for ${examToEdit.name} from a dedicated edit route.` : "Create exam records from a dedicated page instead of a popup."}
+      >
+        <Link href={backHref} className={buttonVariants({ variant: "outline" })}>
           <ArrowLeft size={16} />
           Back to Exams
         </Link>
-        <h1 className="mt-3 text-3xl font-bold text-gray-900 dark:text-zinc-100">
-          {examToEdit ? "Edit Exam" : "Schedule New Exam"}
-        </h1>
-        <p className="mt-1 text-sm text-gray-500 dark:text-zinc-400">
-          {examToEdit ? `Updating details for ${examToEdit.name}` : "Create exam records from a dedicated page instead of a popup."}
-        </p>
-      </div>
+      </AdminPageHeader>
 
       <div className="rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
         <div className="p-6">
@@ -142,10 +142,10 @@ export default function ExamForm({
             </div>
 
             <div className="flex gap-3 pt-4">
-              <Link href={backHref} className="flex-1 rounded-xl border border-gray-200 px-4 py-2.5 text-center font-semibold text-gray-700 transition-colors hover:bg-gray-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800">
+              <Link href={backHref} className={`${buttonVariants({ variant: "outline" })} flex-1`}>
                 Cancel
               </Link>
-              <button type="submit" disabled={loading} className="flex-1 rounded-xl bg-blue-600 px-4 py-2.5 font-semibold text-white transition-all active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70 hover:bg-blue-700">
+              <button type="submit" disabled={loading} className={`${buttonVariants({ variant: "default" })} flex-1`}>
                 {loading ? "Saving..." : examToEdit ? "Update Exam" : "Create Exam"}
               </button>
             </div>

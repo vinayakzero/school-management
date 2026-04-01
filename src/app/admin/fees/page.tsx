@@ -26,13 +26,11 @@ export default async function FeesPage() {
   ]);
 
   return (
-    <div className="min-h-screen bg-gray-50/50 p-4 dark:bg-black sm:p-6 lg:p-8">
-      <FeesClient
-        students={JSON.parse(JSON.stringify(students))}
-        feeStructures={JSON.parse(JSON.stringify(feeStructures))}
-        payments={JSON.parse(JSON.stringify(payments))}
-        currencySymbol={setting?.currencySymbol || "$"}
-      />
-    </div>
+    <FeesClient
+      students={JSON.parse(JSON.stringify(students))}
+      feeStructures={JSON.parse(JSON.stringify(feeStructures))}
+      payments={JSON.parse(JSON.stringify(payments))}
+      currencySymbol={setting?.currencySymbol || "$"}
+    />
   );
 }

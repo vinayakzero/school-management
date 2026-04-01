@@ -1,8 +1,7 @@
-import Link from "next/link";
-import { ArrowLeft, Printer } from "lucide-react";
 import connectDB from "@/lib/mongodb";
 import Exam from "@/models/Exam";
 import Setting from "@/models/Setting";
+import { PrintPageLayout } from "@/components/admin/print-layout";
 
 export const dynamic = "force-dynamic";
 
@@ -24,29 +23,15 @@ export default async function ExamTimetablePrintPage() {
   }, new Map<string, any[]>());
 
   return (
-    <div className="mx-auto max-w-6xl space-y-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <Link
-          href="/admin/exams"
-          className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 transition-colors hover:text-blue-600 dark:text-zinc-400 dark:hover:text-blue-400"
-        >
-          <ArrowLeft size={16} />
-          Back to Exams
-        </Link>
-        <p className="inline-flex items-center gap-2 text-sm text-gray-500 dark:text-zinc-400">
-          <Printer size={15} />
-          Open browser print to print this timetable.
-        </p>
-      </div>
-
-      <div className="overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-        <div className="border-b border-gray-200 bg-gradient-to-r from-slate-900 via-blue-900 to-sky-700 px-8 py-8 text-white dark:border-zinc-800">
-          <p className="text-sm font-semibold uppercase tracking-[0.25em] text-white/70">Academic Printout</p>
-          <h1 className="mt-3 text-3xl font-black">Exam Timetable</h1>
-          <p className="mt-2 text-sm text-white/80">{schoolName}</p>
-          <p className="mt-1 text-sm text-white/70">Academic Year {academicYear}</p>
-        </div>
-
+    <PrintPageLayout
+      backHref="/admin/exams"
+      backLabel="Back to Exams"
+      eyebrow="Academic Printout"
+      title="Exam Timetable"
+      subtitle={`${schoolName} • Academic Year ${academicYear}`}
+      note="Open browser print to print this timetable."
+    >
+      <>
         <div className="space-y-8 px-8 py-8">
           {Array.from(grouped.entries()).map(([grade, gradeExams]) => (
             <section key={grade} className="space-y-4">
@@ -86,7 +71,7 @@ export default async function ExamTimetablePrintPage() {
             </section>
           ))}
         </div>
-      </div>
-    </div>
+      </>
+    </PrintPageLayout>
   );
 }

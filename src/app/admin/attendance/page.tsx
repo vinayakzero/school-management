@@ -6,6 +6,8 @@ import Event from "@/models/Event";
 import AttendanceForm from "./AttendanceForm";
 import Link from "next/link";
 import { BarChart3, Calendar, Filter, History, Flag, Sparkles, ChevronLeft, ChevronRight, LayoutList, CalendarDays, Printer } from "lucide-react";
+import { AdminPageHeader } from "@/components/admin/page-header";
+import { buttonVariants } from "@/components/ui/button";
 
 export const dynamic = 'force-dynamic';
 
@@ -102,35 +104,27 @@ export default async function AttendancePage({ searchParams }: { searchParams: {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-zinc-100">Attendance</h1>
-          <p className="text-gray-500 dark:text-zinc-400">Record and monitor daily student attendance by class.</p>
-        </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <Link
-            href={`/admin/attendance/register?grade=${encodeURIComponent(gradeParam || "")}&section=${encodeURIComponent(sectionParam || "")}&month=${dateParam.slice(0, 7)}`}
-            className="inline-flex items-center justify-center gap-2 rounded-lg text-sm font-semibold bg-white dark:bg-zinc-900 text-gray-700 dark:text-zinc-300 border border-gray-200 dark:border-zinc-800 h-10 px-4 shadow-sm hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors"
-          >
-            <Printer size={18} />
-            Print Register
-          </Link>
-          <Link
-            href="/admin/attendance/history"
-            className="inline-flex items-center justify-center gap-2 rounded-lg text-sm font-semibold bg-white dark:bg-zinc-900 text-gray-700 dark:text-zinc-300 border border-gray-200 dark:border-zinc-800 h-10 px-4 shadow-sm hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors"
-          >
-            <History size={18} />
-            View History
-          </Link>
-          <Link
-            href="/admin/attendance/reports"
-            className="inline-flex items-center justify-center gap-2 rounded-lg text-sm font-semibold bg-gray-900 dark:bg-zinc-100 text-white dark:text-zinc-900 h-10 px-4 shadow-sm hover:bg-gray-800 dark:hover:bg-zinc-200 transition-colors"
-          >
-            <BarChart3 size={18} />
-            View Reports
-          </Link>
-        </div>
-      </div>
+      <AdminPageHeader
+        eyebrow="Core Admin Surface"
+        title="Attendance Control"
+        description="Record daily attendance by class, block holiday dates automatically, and move directly into historical and printable views."
+      >
+        <Link
+          href={`/admin/attendance/register?grade=${encodeURIComponent(gradeParam || "")}&section=${encodeURIComponent(sectionParam || "")}&month=${dateParam.slice(0, 7)}`}
+          className={buttonVariants({ variant: "outline" })}
+        >
+          <Printer size={18} />
+          Print Register
+        </Link>
+        <Link href="/admin/attendance/history" className={buttonVariants({ variant: "outline" })}>
+          <History size={18} />
+          View History
+        </Link>
+        <Link href="/admin/attendance/reports" className={buttonVariants({ variant: "default" })}>
+          <BarChart3 size={18} />
+          View Reports
+        </Link>
+      </AdminPageHeader>
 
       <div className="bg-white dark:bg-zinc-900 p-6 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-sm">
         <form method="GET" className="grid grid-cols-1 lg:grid-cols-[1.1fr_1.1fr_1.1fr_auto] gap-4 items-end">

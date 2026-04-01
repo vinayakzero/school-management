@@ -5,6 +5,8 @@ import { useState, useRef } from "react";
 import { Loader2, ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createStudentAction, updateStudentAction } from "./actions";
+import { AdminPageHeader } from "@/components/admin/page-header";
+import { buttonVariants } from "@/components/ui/button";
 
 const GRADES = ["Grade 1","Grade 2","Grade 3","Grade 4","Grade 5","Grade 6","Grade 7","Grade 8","Grade 9","Grade 10","Grade 11","Grade 12"];
 const SECTIONS = ["A", "B", "C", "D"];
@@ -41,21 +43,16 @@ export default function StudentForm({ student, backHref = "/admin/students" }: {
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
-      <div>
-        <Link
-          href={backHref}
-          className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 transition-colors hover:text-blue-600 dark:text-zinc-400 dark:hover:text-blue-400"
-        >
+      <AdminPageHeader
+        eyebrow="Route-Based Workflow"
+        title={isEdit ? "Edit Student" : "Add New Student"}
+        description={isEdit ? "Update student information." : "Fill in the details to enroll a new student."}
+      >
+        <Link href={backHref} className={buttonVariants({ variant: "outline" })}>
           <ArrowLeft size={16} />
           Back to Students
         </Link>
-        <h1 className="mt-3 text-3xl font-bold text-gray-900 dark:text-zinc-100">
-          {isEdit ? "Edit Student" : "Add New Student"}
-        </h1>
-        <p className="mt-1 text-sm text-gray-500 dark:text-zinc-400">
-          {isEdit ? "Update student information." : "Fill in the details to enroll a new student."}
-        </p>
-      </div>
+      </AdminPageHeader>
 
       <div className="rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
         <div className="overflow-y-auto px-6 py-5">
@@ -177,7 +174,7 @@ export default function StudentForm({ student, backHref = "/admin/students" }: {
             <Link href={backHref} className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800">
               Cancel
             </Link>
-            <button form="student-form" type="submit" disabled={isSubmitting} className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-500 disabled:opacity-60">
+            <button form="student-form" type="submit" disabled={isSubmitting} className={buttonVariants({ variant: "default" })}>
               {isSubmitting && <Loader2 size={15} className="animate-spin" />}
               {isEdit ? "Save Changes" : "Add Student"}
             </button>

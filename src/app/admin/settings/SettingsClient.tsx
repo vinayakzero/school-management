@@ -64,7 +64,7 @@ export default function SettingsClient({ initialSettings }: { initialSettings: a
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Global Settings</h1>
         <p className="mt-2 text-gray-500 dark:text-zinc-400">
-          Manage your school's core configurations and localization preferences.
+          Manage your school&apos;s core configurations and localization preferences.
         </p>
       </div>
 

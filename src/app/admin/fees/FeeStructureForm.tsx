@@ -5,6 +5,8 @@ import { useRef, useState } from "react";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { addFeeStructureAction, updateFeeStructureAction } from "./actions";
+import { AdminPageHeader } from "@/components/admin/page-header";
+import { buttonVariants } from "@/components/ui/button";
 
 const GRADES = ["Grade 1","Grade 2","Grade 3","Grade 4","Grade 5","Grade 6","Grade 7","Grade 8","Grade 9","Grade 10","Grade 11","Grade 12"];
 const CATEGORIES = ["Tuition", "Transport", "Library", "Examination", "Miscellaneous"];
@@ -42,18 +44,16 @@ export default function FeeStructureForm({ feeStructure }: { feeStructure?: any 
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
-      <div>
-        <Link href="/admin/fees" className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 transition-colors hover:text-blue-600 dark:text-zinc-400 dark:hover:text-blue-400">
+      <AdminPageHeader
+        eyebrow="Route-Based Workflow"
+        title={isEdit ? "Edit Fee Structure" : "New Fee Structure"}
+        description="Define class-wise fee schedules, late-fee rules, and installment readiness."
+      >
+        <Link href="/admin/fees" className={buttonVariants({ variant: "outline" })}>
           <ArrowLeft size={16} />
           Back to Fees
         </Link>
-        <h1 className="mt-3 text-3xl font-bold text-gray-900 dark:text-zinc-100">
-          {isEdit ? "Edit Fee Structure" : "New Fee Structure"}
-        </h1>
-        <p className="mt-1 text-sm text-gray-500 dark:text-zinc-400">
-          Define class-wise fee schedules, late-fee rules, and installment readiness.
-        </p>
-      </div>
+      </AdminPageHeader>
 
       <form ref={formRef} onSubmit={handleSubmit} className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
         <div className="space-y-5">
@@ -180,10 +180,10 @@ export default function FeeStructureForm({ feeStructure }: { feeStructure?: any 
           </div>
 
           <div className="flex justify-end gap-3 pt-2">
-            <Link href="/admin/fees" className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800">
+            <Link href="/admin/fees" className={buttonVariants({ variant: "outline" })}>
               Cancel
             </Link>
-            <button type="submit" disabled={isSubmitting} className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:opacity-70">
+            <button type="submit" disabled={isSubmitting} className={buttonVariants({ variant: "default" })}>
               {isSubmitting && <Loader2 size={16} className="animate-spin" />}
               {isEdit ? "Save Changes" : "Create Fee Structure"}
             </button>

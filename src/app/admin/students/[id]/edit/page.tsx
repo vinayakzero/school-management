@@ -18,9 +18,5 @@ export default async function EditStudentPage({ params }: { params: { id: string
     notFound();
   }
 
-  return (
-    <div className="min-h-screen bg-gray-50/50 p-4 dark:bg-black sm:p-6 lg:p-8">
-      <StudentForm student={JSON.parse(JSON.stringify(student))} />
-    </div>
-  );
+  return <StudentForm student={JSON.parse(JSON.stringify(student))} />;
 }

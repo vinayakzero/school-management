@@ -12,9 +12,5 @@ export default async function ExamsPage() {
     .sort({ date: -1, name: 1 })
     .lean();
 
-  return (
-    <div className="min-h-screen bg-gray-50/50 dark:bg-black p-4 sm:p-6 lg:p-8">
-      <ExamsClient exams={JSON.parse(JSON.stringify(exams))} subjects={[]} />
-    </div>
-  );
+  return <ExamsClient exams={JSON.parse(JSON.stringify(exams))} subjects={[]} />;
 }

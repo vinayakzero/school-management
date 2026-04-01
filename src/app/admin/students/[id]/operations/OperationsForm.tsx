@@ -5,6 +5,8 @@ import { useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { runStudentOperationAction } from "../../actions";
+import { AdminPageHeader } from "@/components/admin/page-header";
+import { buttonVariants } from "@/components/ui/button";
 
 const OPERATIONS = [
   { value: "promote", label: "Promote" },
@@ -44,16 +46,16 @@ export default function OperationsForm({ student }: { student: any }) {
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <div>
-        <Link href={`/admin/students/${student._id}`} className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 transition-colors hover:text-blue-600 dark:text-zinc-400 dark:hover:text-blue-400">
+      <AdminPageHeader
+        eyebrow="Route-Based Workflow"
+        title="Student Operations"
+        description={`Manage promotions, transfers, withdrawals, archives, and reactivation for ${student.name}.`}
+      >
+        <Link href={`/admin/students/${student._id}`} className={buttonVariants({ variant: "outline" })}>
           <ArrowLeft size={16} />
           Back to Student Profile
         </Link>
-        <h1 className="mt-3 text-3xl font-bold text-gray-900 dark:text-zinc-100">Student Operations</h1>
-        <p className="mt-1 text-sm text-gray-500 dark:text-zinc-400">
-          Manage promotions, transfers, withdrawals, archives, and reactivation for {student.name}.
-        </p>
-      </div>
+      </AdminPageHeader>
 
       <form onSubmit={handleSubmit} className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
         <div className="space-y-5">
@@ -99,10 +101,10 @@ export default function OperationsForm({ student }: { student: any }) {
           </div>
 
           <div className="flex justify-end gap-3 pt-2">
-            <Link href={`/admin/students/${student._id}`} className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800">
+            <Link href={`/admin/students/${student._id}`} className={buttonVariants({ variant: "outline" })}>
               Cancel
             </Link>
-            <button type="submit" disabled={saving} className="rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-70">
+            <button type="submit" disabled={saving} className={buttonVariants({ variant: "default" })}>
               {saving ? "Saving..." : "Apply Operation"}
             </button>
           </div>

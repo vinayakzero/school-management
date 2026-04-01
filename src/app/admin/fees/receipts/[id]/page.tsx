@@ -1,10 +1,9 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
 import mongoose from "mongoose";
 import connectDB from "@/lib/mongodb";
 import Payment from "@/models/Payment";
 import Setting from "@/models/Setting";
+import { PrintPageLayout } from "@/components/admin/print-layout";
 
 export const dynamic = "force-dynamic";
 
@@ -34,22 +33,14 @@ export default async function FeeReceiptPage({ params }: { params: { id: string 
   const structure = payment.feeStructureId as any;
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <Link href="/admin/fees" className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 transition-colors hover:text-blue-600 dark:text-zinc-400 dark:hover:text-blue-400">
-          <ArrowLeft size={16} />
-          Back to Fees
-        </Link>
-        <p className="text-sm text-gray-500 dark:text-zinc-400">Open your browser print dialog to print this receipt.</p>
-      </div>
-
-      <div className="overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-        <div className="border-b border-gray-200 bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-8 text-white dark:border-zinc-800">
-          <p className="text-sm font-semibold uppercase tracking-[0.3em] text-white/70">Payment Receipt</p>
-          <h1 className="mt-3 text-3xl font-black">{schoolName}</h1>
-          <p className="mt-2 max-w-2xl text-sm text-white/80">{schoolAddress}</p>
-        </div>
-
+    <PrintPageLayout
+      backHref="/admin/fees"
+      backLabel="Back to Fees"
+      eyebrow="Payment Receipt"
+      title={schoolName}
+      subtitle={schoolAddress}
+    >
+      <>
         <div className="grid gap-8 px-8 py-8 lg:grid-cols-2">
           <ReceiptBlock title="Receipt Details">
             <ReceiptRow label="Receipt No." value={payment.receiptNo} />
@@ -87,8 +78,8 @@ export default async function FeeReceiptPage({ params }: { params: { id: string 
         <div className="border-t border-dashed border-gray-200 px-8 py-6 text-sm text-gray-500 dark:border-zinc-800 dark:text-zinc-400">
           This receipt was generated from the school management fee module and is ready for printing or sharing.
         </div>
-      </div>
-    </div>
+      </>
+    </PrintPageLayout>
   );
 }
 

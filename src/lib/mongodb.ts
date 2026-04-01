@@ -15,12 +15,14 @@ import "@/models/FeeStructure";
 import "@/models/Payment";
 import "@/models/Setting";
 import "@/models/CertificateTemplate";
+import "@/models/AdmissionInquiry";
+import "@/models/AdmissionApplication";
 
-const DB_CONNECTION = process.env.DB_CONNECTION || "";
+const DB_CONNECTION = process.env.DB_CONNECTION || process.env.MONGODB_URI || "";
 
 if (!DB_CONNECTION) {
   throw new Error(
-    "Please define the DB_CONNECTION environment variable inside .env.local"
+    "Please define DB_CONNECTION (preferred) or MONGODB_URI inside .env.local"
   );
 }
 

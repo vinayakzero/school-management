@@ -2,8 +2,15 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { UserPlus, Search, Edit2, Trash2 } from "lucide-react";
+import { UserPlus, Search, Edit2, Trash2, Users } from "lucide-react";
 import { deleteStudentAction } from "./actions";
+import { AdminPageHeader } from "@/components/admin/page-header";
+import { AdminSectionCard } from "@/components/admin/section-card";
+import { AdminEmptyState } from "@/components/admin/empty-state";
+import { buttonVariants } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 export default function StudentsClient({ students: initialStudents }: { students: any[] }) {
   const [students, setStudents] = useState(initialStudents);
@@ -28,86 +35,109 @@ export default function StudentsClient({ students: initialStudents }: { students
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-zinc-100">Students</h1>
-          <p className="text-gray-500 dark:text-zinc-400">Manage student records and enrollments. Total: {students.length}</p>
-        </div>
-        <Link
-          href="/admin/students/new"
-          className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-500"
-        >
+      <AdminPageHeader
+        eyebrow="Core Admin Surface"
+        title="Student Registry"
+        description={`Manage enrollment records, identity details, and linked student workflows. ${students.length} total record${students.length === 1 ? "" : "s"} available.`}
+      >
+        <Link href="/admin/students/new" className={buttonVariants({ variant: "default" })}>
           <UserPlus size={18} />
           Add Student
         </Link>
-      </div>
+      </AdminPageHeader>
 
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-        <div className="flex flex-col items-center justify-between gap-4 border-b border-gray-200 bg-gray-50/50 p-4 dark:border-zinc-800 dark:bg-zinc-900/50 sm:flex-row">
-          <div className="relative w-full sm:w-80">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-            <input
+      <AdminSectionCard
+        title="Student List"
+        description="Search by identity, grade, or record details and jump directly into student workflows."
+      >
+        <div className="flex flex-col items-center justify-between gap-4 border-b border-border/70 bg-muted/50 p-4 sm:flex-row">
+          <div className="relative w-full sm:w-96">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
               type="text"
-              placeholder="Search by name, email, grade..."
+              placeholder="Search by name, email, grade, admission number, or roll number"
               value={search}
-              onChange={e => setSearch(e.target.value)}
-              className="h-10 w-full rounded-lg border border-gray-200 bg-white pl-10 pr-4 text-sm transition-shadow focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-300"
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-10"
             />
           </div>
-          <span className="text-sm text-gray-500 dark:text-zinc-400">{filtered.length} result{filtered.length !== 1 ? "s" : ""}</span>
+          <span className="text-sm font-medium text-muted-foreground">
+            {filtered.length} result{filtered.length !== 1 ? "s" : ""}
+          </span>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead>
-              <tr className="border-b border-gray-200 bg-gray-50/50 text-gray-500 dark:border-zinc-800 dark:bg-zinc-900/50 dark:text-zinc-400">
-                <th className="px-6 py-4 font-medium">Student Info</th>
-                <th className="px-6 py-4 font-medium">Identity</th>
-                <th className="px-6 py-4 font-medium">Grade / Section</th>
-                <th className="px-6 py-4 font-medium">Date of Birth</th>
-                <th className="px-6 py-4 font-medium">Status</th>
-                <th className="px-6 py-4 text-right font-medium">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100 dark:divide-zinc-800">
+        {filtered.length === 0 ? (
+          <div className="p-6">
+            <AdminEmptyState
+              icon={Users}
+              title="No students matched this search"
+              description="Try a different search term or add a new student record to begin the admission workflow."
+              actionHref="/admin/students/new"
+              actionLabel="Add Student"
+            />
+          </div>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-muted/50 hover:bg-muted/50">
+                <TableHead>Student Info</TableHead>
+                <TableHead>Identity</TableHead>
+                <TableHead>Grade / Section</TableHead>
+                <TableHead>Date of Birth</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {filtered.map((student) => (
-                <tr key={student._id} className="group transition-colors hover:bg-gray-50/80 dark:hover:bg-zinc-800/80">
-                  <td className="px-6 py-4">
+                <TableRow key={student._id} className="group">
+                  <TableCell>
                     <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-blue-200 bg-blue-100 text-sm font-bold text-blue-700 dark:border-blue-800/50 dark:bg-blue-900/30 dark:text-blue-400">
+                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-primary/15 bg-primary/10 text-sm font-bold text-primary">
                         {student.name.split(" ").slice(0, 2).map((n: string) => n[0]).join("")}
                       </div>
                       <div>
-                        <Link href={`/admin/students/${student._id}`} className="font-semibold text-gray-900 transition-colors hover:text-blue-600 dark:text-zinc-100 dark:hover:text-blue-400">{student.name}</Link>
-                        <div className="text-xs text-gray-500 dark:text-zinc-400">{student.email}</div>
+                        <Link href={`/admin/students/${student._id}`} className="font-semibold text-foreground transition-colors hover:text-primary">
+                          {student.name}
+                        </Link>
+                        <div className="text-xs text-muted-foreground">{student.email}</div>
                       </div>
                     </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="font-medium text-gray-900 dark:text-zinc-200">{student.admissionNumber || "-"}</div>
-                    <div className="text-xs text-gray-500 dark:text-zinc-400">Roll {student.rollNumber || "-"}</div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="font-medium text-gray-900 dark:text-zinc-200">{student.grade}</div>
-                    <div className="text-xs text-gray-500 dark:text-zinc-400">Section {student.section}</div>
-                  </td>
-                  <td className="px-6 py-4 text-gray-600 dark:text-zinc-400">
-                    {student.dateOfBirth ? new Date(student.dateOfBirth).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "-"}
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${
-                      student.status === "Active" ? "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-400"
-                      : student.status === "Pending" ? "border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-400"
-                      : "border-gray-200 bg-gray-100 text-gray-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400"
-                    }`}>
+                  </TableCell>
+                  <TableCell>
+                    <div className="font-medium text-foreground">{student.admissionNumber || "-"}</div>
+                    <div className="text-xs text-muted-foreground">Roll {student.rollNumber || "-"}</div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="font-medium text-foreground">{student.grade}</div>
+                    <div className="text-xs text-muted-foreground">Section {student.section}</div>
+                  </TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {student.dateOfBirth
+                      ? new Date(student.dateOfBirth).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })
+                      : "-"}
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={student.status === "Active" ? "success" : student.status === "Pending" ? "warning" : "muted"}>
                       {student.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center justify-end gap-2 opacity-0 transition-opacity group-hover:opacity-100">
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center justify-end gap-2">
+                      <Link
+                        href={`/admin/students/${student._id}`}
+                        className={buttonVariants({ variant: "outline", size: "sm" })}
+                        title="Open"
+                      >
+                        Open
+                      </Link>
                       <Link
                         href={`/admin/students/${student._id}/edit`}
-                        className="rounded-md p-1.5 text-gray-500 transition-colors hover:bg-blue-50 hover:text-blue-600 dark:text-zinc-400 dark:hover:bg-blue-900/20 dark:hover:text-blue-400"
+                        className={buttonVariants({ variant: "ghost", size: "icon" })}
                         title="Edit"
                       >
                         <Edit2 size={16} />
@@ -115,19 +145,19 @@ export default function StudentsClient({ students: initialStudents }: { students
                       <button
                         onClick={() => handleDelete(student._id, student.name)}
                         disabled={deletingId === student._id}
-                        className="rounded-md p-1.5 text-gray-500 transition-colors hover:bg-red-50 hover:text-red-600 disabled:opacity-50 dark:text-zinc-400 dark:hover:bg-red-900/20 dark:hover:text-red-400"
+                        className={buttonVariants({ variant: "ghost", size: "icon" })}
                         title="Delete"
                       >
-                        <Trash2 size={16} />
+                        <Trash2 size={16} className="text-red-600 dark:text-red-400" />
                       </button>
                     </div>
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+            </TableBody>
+          </Table>
+        )}
+      </AdminSectionCard>
     </div>
   );
 }

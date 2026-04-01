@@ -30,6 +30,8 @@ A modern, high-performance School Management System built with the latest techno
 3. **Configure Environment Variables**:
    Create a `.env.local` file with the following:
    ```env
+   DB_CONNECTION=mongodb+srv://<username>:<password>@<cluster-host>/skool
+   # Backward-compatible alias also supported:
    MONGODB_URI=mongodb+srv://<username>:<password>@<cluster-host>/skool
    ```
 

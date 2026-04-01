@@ -23,13 +23,11 @@ export default async function NewPaymentPage({
   ]);
 
   return (
-    <div className="min-h-screen bg-gray-50/50 p-4 dark:bg-black sm:p-6 lg:p-8">
-      <PaymentForm
-        students={JSON.parse(JSON.stringify(students))}
-        feeStructures={JSON.parse(JSON.stringify(feeStructures))}
-        initialStudentId={searchParams?.studentId || ""}
-        currencySymbol={setting?.currencySymbol || "$"}
-      />
-    </div>
+    <PaymentForm
+      students={JSON.parse(JSON.stringify(students))}
+      feeStructures={JSON.parse(JSON.stringify(feeStructures))}
+      initialStudentId={searchParams?.studentId || ""}
+      currencySymbol={setting?.currencySymbol || "$"}
+    />
   );
 }

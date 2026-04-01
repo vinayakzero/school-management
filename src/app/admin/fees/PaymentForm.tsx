@@ -5,6 +5,8 @@ import { useMemo, useRef, useState } from "react";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { recordPaymentAction } from "./actions";
+import { AdminPageHeader } from "@/components/admin/page-header";
+import { buttonVariants } from "@/components/ui/button";
 
 const PAYMENT_MODES = ["Cash", "Online", "Bank Transfer", "Cheque"];
 
@@ -63,16 +65,16 @@ export default function PaymentForm({
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
-      <div>
-        <Link href="/admin/fees" className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 transition-colors hover:text-blue-600 dark:text-zinc-400 dark:hover:text-blue-400">
+      <AdminPageHeader
+        eyebrow="Route-Based Workflow"
+        title="Record Payment"
+        description="Capture collections, concessions, installment notes, and office-level fine handling in one entry."
+      >
+        <Link href="/admin/fees" className={buttonVariants({ variant: "outline" })}>
           <ArrowLeft size={16} />
           Back to Fees
         </Link>
-        <h1 className="mt-3 text-3xl font-bold text-gray-900 dark:text-zinc-100">Record Payment</h1>
-        <p className="mt-1 text-sm text-gray-500 dark:text-zinc-400">
-          Capture collections, concessions, installment notes, and office-level fine handling in one entry.
-        </p>
-      </div>
+      </AdminPageHeader>
 
       <form ref={formRef} onSubmit={handleSubmit} className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
         <div className="space-y-4">
@@ -184,10 +186,10 @@ export default function PaymentForm({
           )}
 
           <div className="flex justify-end gap-3 pt-2">
-            <Link href="/admin/fees" className="rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800">
+            <Link href="/admin/fees" className={buttonVariants({ variant: "outline" })}>
               Cancel
             </Link>
-            <button type="submit" disabled={isSubmitting} className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-700 disabled:opacity-70">
+            <button type="submit" disabled={isSubmitting} className={buttonVariants({ variant: "success" })}>
               {isSubmitting && <Loader2 size={16} className="animate-spin" />}
               Save Payment
             </button>

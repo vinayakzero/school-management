@@ -18,9 +18,5 @@ export default async function EditFeeStructurePage({ params }: { params: { id: s
     notFound();
   }
 
-  return (
-    <div className="min-h-screen bg-gray-50/50 p-4 dark:bg-black sm:p-6 lg:p-8">
-      <FeeStructureForm feeStructure={JSON.parse(JSON.stringify(feeStructure))} />
-    </div>
-  );
+  return <FeeStructureForm feeStructure={JSON.parse(JSON.stringify(feeStructure))} />;
 }

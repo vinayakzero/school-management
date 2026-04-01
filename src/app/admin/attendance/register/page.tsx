@@ -1,10 +1,9 @@
-import Link from "next/link";
-import { ArrowLeft, Printer } from "lucide-react";
 import connectDB from "@/lib/mongodb";
 import Attendance from "@/models/Attendance";
 import Student from "@/models/Student";
 import ClassModel from "@/models/Class";
 import Setting from "@/models/Setting";
+import { PrintPageLayout } from "@/components/admin/print-layout";
 
 export const dynamic = "force-dynamic";
 
@@ -71,29 +70,15 @@ export default async function AttendanceRegisterPrintPage({
   const monthLabel = monthStart.toLocaleDateString("en-US", { month: "long", year: "numeric" });
 
   return (
-    <div className="mx-auto max-w-7xl space-y-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <Link
-          href={`/admin/attendance?grade=${encodeURIComponent(activeGrade)}&section=${encodeURIComponent(activeSection)}&date=${monthParam}-01`}
-          className="inline-flex items-center gap-2 text-sm font-medium text-gray-500 transition-colors hover:text-blue-600 dark:text-zinc-400 dark:hover:text-blue-400"
-        >
-          <ArrowLeft size={16} />
-          Back to Attendance
-        </Link>
-        <p className="inline-flex items-center gap-2 text-sm text-gray-500 dark:text-zinc-400">
-          <Printer size={15} />
-          Open browser print to print this register.
-        </p>
-      </div>
-
-      <div className="rounded-3xl border border-gray-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-        <div className="border-b border-gray-200 bg-gradient-to-r from-slate-900 via-blue-900 to-sky-700 px-8 py-8 text-white dark:border-zinc-800">
-          <p className="text-sm font-semibold uppercase tracking-[0.25em] text-white/70">Attendance Register</p>
-          <h1 className="mt-3 text-3xl font-black">{schoolName}</h1>
-          <p className="mt-2 text-sm text-white/80">{activeGrade} - Section {activeSection}</p>
-          <p className="mt-1 text-sm text-white/70">{monthLabel}</p>
-        </div>
-
+    <PrintPageLayout
+      backHref={`/admin/attendance?grade=${encodeURIComponent(activeGrade)}&section=${encodeURIComponent(activeSection)}&date=${monthParam}-01`}
+      backLabel="Back to Attendance"
+      eyebrow="Attendance Register"
+      title={schoolName}
+      subtitle={`${activeGrade} - Section ${activeSection} • ${monthLabel}`}
+      note="Open browser print to print this register."
+    >
+      <>
         <div className="space-y-6 px-8 py-8">
           <form method="GET" className="grid gap-4 rounded-2xl border border-gray-200 bg-gray-50/70 p-4 dark:border-zinc-800 dark:bg-zinc-950/60 md:grid-cols-[1fr_1fr_1fr_auto]">
             <select name="grade" defaultValue={activeGrade} className="rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100">
@@ -155,7 +140,7 @@ export default async function AttendanceRegisterPrintPage({
             <span>E = Excused</span>
           </div>
         </div>
-      </div>
-    </div>
+      </>
+    </PrintPageLayout>
   );
 }
