@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import PublicShell from "@/components/public/public-shell";
-import { schoolProfile } from "@/lib/public-site";
+import { schoolProfile } from "@/lib/public-site-v2";
 
 export const metadata: Metadata = {
   title: {

@@ -2,15 +2,28 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronRight, ShieldCheck, Sparkles } from "lucide-react";
+import { useSession, signOut } from "next-auth/react";
+import { ChevronRight, Sparkles, LogOut, ChevronDown } from "lucide-react";
 import type { ReactNode } from "react";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { ADMIN_NAV_ITEMS, getActiveAdminItem, getAdminBreadcrumbs } from "./route-meta";
 
+const ROLE_LABELS: Record<string, { label: string; color: string }> = {
+  super_admin: { label: "Super Admin", color: "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400" },
+  admin: { label: "Admin", color: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400" },
+  accountant: { label: "Accountant", color: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400" },
+  teacher: { label: "Teacher", color: "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400" },
+  parent: { label: "Parent", color: "bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-400" },
+};
+
 export default function AdminShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  const { data: session } = useSession();
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+
   const activeItem = getActiveAdminItem(pathname);
   const breadcrumbs = getAdminBreadcrumbs(pathname);
   const currentLabel = breadcrumbs[breadcrumbs.length - 1]?.label || activeItem.label;
@@ -18,10 +31,19 @@ export default function AdminShell({ children }: { children: ReactNode }) {
   const headerTitle =
     currentLabel === activeItem.label ? activeItem.label : genericLabels.has(currentLabel) ? `${activeItem.label} ${currentLabel}` : currentLabel;
 
+  const userRole = (session?.user as any)?.role || "admin";
+  const userName = session?.user?.name || "Admin";
+  const roleInfo = ROLE_LABELS[userRole] || ROLE_LABELS.admin;
+  const initials = userName.split(" ").slice(0, 2).map((n: string) => n[0]).join("").toUpperCase();
+
   return (
     <div className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(13,74,140,0.08),_transparent_38%),linear-gradient(180deg,_rgba(244,247,251,0.98),_rgba(238,243,248,0.96))] text-foreground dark:bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.16),_transparent_30%),linear-gradient(180deg,_rgba(9,14,24,0.98),_rgba(8,12,20,0.98))]">
       <div className="flex min-h-screen">
+
+        {/* Sidebar */}
         <aside className="hidden w-72 shrink-0 border-r border-border/70 bg-[linear-gradient(180deg,_rgba(255,255,255,0.94),_rgba(246,249,252,0.92))] px-5 py-6 backdrop-blur xl:flex xl:flex-col dark:bg-[linear-gradient(180deg,_rgba(9,14,24,0.98),_rgba(11,17,29,0.98))]">
+
+          {/* Brand */}
           <Link href="/admin" className="rounded-[28px] border border-border/80 bg-background/95 px-5 py-5 shadow-sm">
             <div className="flex items-center gap-3">
               <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/15">
@@ -37,6 +59,7 @@ export default function AdminShell({ children }: { children: ReactNode }) {
             </p>
           </Link>
 
+          {/* Nav */}
           <nav className="mt-6 flex-1 space-y-1.5 overflow-y-auto pr-1">
             {ADMIN_NAV_ITEMS.map((item) => {
               const isActive =
@@ -73,17 +96,50 @@ export default function AdminShell({ children }: { children: ReactNode }) {
             })}
           </nav>
 
-          <div className="mt-6 rounded-2xl border border-border/80 bg-background/90 p-4">
-            <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
-              <ShieldCheck size={16} className="text-primary" />
-              Admin-first, role-ready
+          {/* User Panel */}
+          <div className="mt-6">
+            <div className="relative">
+              <button
+                onClick={() => setUserMenuOpen(!userMenuOpen)}
+                className="flex w-full items-center gap-3 rounded-2xl border border-border/80 bg-background/90 p-4 transition-colors hover:bg-accent/60"
+              >
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-primary text-sm font-bold text-primary-foreground">
+                  {initials}
+                </div>
+                <div className="min-w-0 flex-1 text-left">
+                  <p className="truncate text-sm font-semibold text-foreground">{userName}</p>
+                  <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold", roleInfo.color)}>
+                    {roleInfo.label}
+                  </span>
+                </div>
+                <ChevronDown size={14} className={cn("shrink-0 text-muted-foreground transition-transform", userMenuOpen && "rotate-180")} />
+              </button>
+
+              {userMenuOpen && (
+                <div className="absolute bottom-full mb-2 w-full rounded-2xl border border-border/80 bg-background shadow-lg">
+                  <div className="p-2">
+                    <Link
+                      href="/admin/users"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground"
+                    >
+                      Manage Users
+                    </Link>
+                    <button
+                      onClick={() => signOut({ callbackUrl: "/login" })}
+                      className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30"
+                    >
+                      <LogOut size={14} />
+                      Sign Out
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
-            <p className="mt-2 text-xs leading-5 text-muted-foreground">
-              This foundation pass stabilizes core school operations before auth and external portals.
-            </p>
           </div>
         </aside>
 
+        {/* Main content */}
         <div className="flex min-w-0 flex-1 flex-col">
           <header className="sticky top-0 z-30 border-b border-border/70 bg-background/85 backdrop-blur-xl">
             <div className="px-4 py-4 sm:px-6 lg:px-8">
@@ -108,15 +164,29 @@ export default function AdminShell({ children }: { children: ReactNode }) {
                   </div>
 
                   <div className="flex flex-wrap items-center gap-2">
-                    <div className="hidden rounded-full border border-border/80 bg-muted/70 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground sm:inline-flex">
-                      School Management System
+                    {/* Mobile user + logout */}
+                    <div className="flex items-center gap-2 xl:hidden">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary text-xs font-bold text-primary-foreground">
+                        {initials}
+                      </div>
+                      <span className={cn("hidden rounded-full px-2 py-0.5 text-[11px] font-semibold sm:inline-flex", roleInfo.color)}>
+                        {roleInfo.label}
+                      </span>
                     </div>
                     <Link href="/admin/settings" className={buttonVariants({ variant: "outline", size: "sm" })}>
                       Settings
                     </Link>
+                    <button
+                      onClick={() => signOut({ callbackUrl: "/login" })}
+                      className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "gap-1.5 text-muted-foreground xl:hidden")}
+                    >
+                      <LogOut size={14} />
+                      <span className="hidden sm:inline">Sign Out</span>
+                    </button>
                   </div>
                 </div>
 
+                {/* Mobile nav */}
                 <nav className="flex gap-2 overflow-x-auto pb-1 xl:hidden">
                   {ADMIN_NAV_ITEMS.map((item) => {
                     const isActive =

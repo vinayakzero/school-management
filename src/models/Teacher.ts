@@ -14,6 +14,10 @@ export interface ITeacher extends Document {
   address: string;
   avatar?: string;
   classes: string[];
+  employeeCode?: string;
+  department?: string;
+  designation?: string;
+  reportingTo?: mongoose.Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -37,6 +41,10 @@ const TeacherSchema = new Schema<ITeacher>(
     address: { type: String, default: "" },
     avatar: { type: String, default: "" },
     classes: [{ type: String }],
+    employeeCode: { type: String, unique: true, sparse: true },
+    department: { type: String },
+    designation: { type: String },
+    reportingTo: { type: Schema.Types.ObjectId, ref: "Teacher" },
   },
   { timestamps: true }
 );

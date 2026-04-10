@@ -21,6 +21,9 @@ export async function createTeacherAction(formData: FormData) {
       address: formData.get("address") as string,
       joinDate: new Date(formData.get("joinDate") as string),
       classes: classesRaw ? classesRaw.split(",").map((c) => c.trim()).filter(Boolean) : [],
+      employeeCode: formData.get("employeeCode") as string || undefined,
+      department: formData.get("department") as string || undefined,
+      designation: formData.get("designation") as string || undefined,
     };
     await Teacher.create(data);
     revalidatePath("/admin/teachers");
@@ -47,6 +50,9 @@ export async function updateTeacherAction(id: string, formData: FormData) {
       gender: formData.get("gender") as string,
       address: formData.get("address") as string,
       classes: classesRaw ? classesRaw.split(",").map((c) => c.trim()).filter(Boolean) : [],
+      employeeCode: formData.get("employeeCode") as string || undefined,
+      department: formData.get("department") as string || undefined,
+      designation: formData.get("designation") as string || undefined,
     };
     await Teacher.findByIdAndUpdate(id, data, { new: true });
     revalidatePath("/admin/teachers");

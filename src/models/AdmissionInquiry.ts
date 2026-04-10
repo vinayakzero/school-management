@@ -41,7 +41,7 @@ const AdmissionInquirySchema = new Schema<IAdmissionInquiry>(
     },
     sourcePage: {
       type: String,
-      enum: ["admissions", "campus"],
+      enum: ["admissions", "campus", "admission", "inquiry"],
       required: true,
     },
     sourcePath: { type: String, required: true, default: "/admissions" },

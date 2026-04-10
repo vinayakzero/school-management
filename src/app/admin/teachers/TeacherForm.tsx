@@ -116,6 +116,22 @@ export default function TeacherForm({ teacher, backHref = "/admin/teachers" }: {
                   <p className="mt-1 text-xs text-gray-400 dark:text-zinc-500">Comma-separated list of grades.</p>
                 </div>
               </div>
+
+              <p className="pt-2 text-xs font-semibold uppercase tracking-widest text-gray-400 dark:text-zinc-500">HR Details</p>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                <div>
+                  <label className={labelClass}>Employee Code</label>
+                  <input name="employeeCode" type="text" defaultValue={teacher?.employeeCode} className={inputClass} placeholder="e.g. EMP-101" />
+                </div>
+                <div>
+                  <label className={labelClass}>Department</label>
+                  <input name="department" type="text" defaultValue={teacher?.department} className={inputClass} placeholder="e.g. Science" />
+                </div>
+                <div>
+                  <label className={labelClass}>Designation</label>
+                  <input name="designation" type="text" defaultValue={teacher?.designation} className={inputClass} placeholder="e.g. Senior Teacher" />
+                </div>
+              </div>
             </div>
           </form>
         </div>

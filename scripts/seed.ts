@@ -17,6 +17,9 @@ import Student from "../src/models/Student";
 import Subject from "../src/models/Subject";
 import Syllabus from "../src/models/Syllabus";
 import Teacher from "../src/models/Teacher";
+import Timetable from "../src/models/Timetable";
+import User from "../src/models/User";
+import bcrypt from "bcryptjs";
 import fs from "fs";
 import path from "path";
 
@@ -376,6 +379,8 @@ async function clearCollections() {
     Subject.deleteMany({}),
     Syllabus.deleteMany({}),
     Teacher.deleteMany({}),
+    Timetable.deleteMany({}),
+    User.deleteMany({}),
   ]);
 }
 
@@ -790,6 +795,141 @@ async function seed() {
     ]);
     console.log(`Inserted ${eventDocs.length} events`);
 
+    // ── Seed Timetables ──────────────────────────────────────────────────
+    const timetablePayload: any[] = [];
+    const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+    const PERIOD_TIMES = [
+      { start: "08:00", end: "08:45", type: "Theory" },
+      { start: "08:45", end: "09:30", type: "Theory" },
+      { start: "09:30", end: "10:15", type: "Theory" },
+      { start: "10:15", end: "10:45", type: "Break" },
+      { start: "10:45", end: "11:30", type: "Theory" },
+      { start: "11:30", end: "12:15", type: "Theory" },
+      { start: "12:15", end: "13:00", type: "Theory" },
+      { start: "13:00", end: "13:45", type: "Practical" },
+    ];
+    
+    // Seed timetable for first 3 classes to avoid too many records
+    for (let c = 0; c < Math.min(3, classes.length); c++) {
+      const cls = classes[c] as any;
+      const classSubjects = subjects.filter((s:any) => s.grade === cls.grade);
+      
+      DAYS.forEach(day => {
+        PERIOD_TIMES.forEach((pt, pIndex) => {
+          const periodNumber = pIndex + 1;
+          
+          if (pt.type === "Break") {
+            timetablePayload.push({
+              classId: cls._id,
+              grade: cls.grade,
+              section: cls.section,
+              day,
+              periodNumber,
+              startTime: pt.start,
+              endTime: pt.end,
+              subjectId: subjects[0]._id, // Dummy subject for break
+              teacherId: teachers[0]._id, // Dummy teacher for break
+              periodType: "Break",
+              academicSession: ACADEMIC_YEAR,
+            });
+            return;
+          }
+          
+          // Pick a subject and teacher predictably
+          const sIndex = (c + pIndex + (day.length)) % classSubjects.length;
+          const subject = classSubjects[sIndex] || subjects[0];
+          const teacher = teachers.find((t:any) => t._id.equals(subject.assignedTeacher)) || teachers[0];
+          
+          timetablePayload.push({
+            classId: cls._id,
+            grade: cls.grade,
+            section: cls.section,
+            day,
+            periodNumber,
+            startTime: pt.start,
+            endTime: pt.end,
+            subjectId: subject._id,
+            teacherId: teacher._id,
+            periodType: pt.type,
+            roomNumber: `Room ${101 + c}`,
+            academicSession: ACADEMIC_YEAR,
+          });
+        });
+      });
+    }
+    
+    // Avoid double booking in seed (since we use generic teachers if not assigned)
+    // We'll ignore the unique index constraint violations during seed if any occur by filtering unique keys
+    const uniqueTimetablePayload = [];
+    const seenTimetableKeys = new Set();
+    
+    for (const entry of timetablePayload) {
+      const key1 = `${entry.classId}-${entry.day}-${entry.periodNumber}`;
+      const key2 = `${entry.teacherId}-${entry.day}-${entry.periodNumber}`;
+      if (!seenTimetableKeys.has(key1) && !seenTimetableKeys.has(key2)) {
+        seenTimetableKeys.add(key1);
+        seenTimetableKeys.add(key2);
+        uniqueTimetablePayload.push(entry);
+      }
+    }
+
+    const timetables = await Timetable.insertMany(uniqueTimetablePayload);
+    console.log(`Inserted ${timetables.length} timetable entries`);
+
+    // ── Seed Staff Attendance & Leaves ─────────────────────────────────────
+    const STAFF_ATTENDANCE_STATUSES = ["Present", "Present", "Present", "Present", "Absent", "Late", "Half Day", "On Leave"];
+    const staffAttendancePayload: any[] = [];
+    const today = new Date();
+    today.setUTCHours(0, 0, 0, 0);
+
+    for (let i = 0; i < 30; i++) {
+      const date = new Date(today);
+      date.setDate(date.getDate() - i);
+      
+      // Skip Sundays
+      if (date.getDay() === 0) continue;
+
+      teachers.forEach((teacher: any) => {
+        const randomStatus = STAFF_ATTENDANCE_STATUSES[Math.floor(Math.random() * STAFF_ATTENDANCE_STATUSES.length)];
+        staffAttendancePayload.push({
+          teacherId: teacher._id,
+          date: date,
+          status: randomStatus,
+          inTime: randomStatus === "Present" || randomStatus === "Half Day" ? "07:50" : randomStatus === "Late" ? "08:30" : "",
+          outTime: randomStatus === "Present" || randomStatus === "Late" ? "15:00" : randomStatus === "Half Day" ? "12:00" : "",
+          note: randomStatus === "Absent" ? "Unplanned absence" : "",
+        });
+      });
+    }
+
+    // require import StaffAttendance and Leave first
+    const StaffAttendance = (await import("../src/models/StaffAttendance")).default;
+    const Leave = (await import("../src/models/Leave")).default;
+
+    await StaffAttendance.deleteMany({});
+    const insertedAttendance = await StaffAttendance.insertMany(staffAttendancePayload);
+    console.log(`Inserted ${insertedAttendance.length} staff attendance records`);
+
+    await Leave.deleteMany({});
+    const leavePayload = teachers.slice(0, 10).map((teacher: any, idx: number) => {
+      const leaveDate = new Date(today);
+      leaveDate.setDate(leaveDate.getDate() + (idx * 2));
+      return {
+        applicantType: "Teacher",
+        applicantId: teacher._id,
+        leaveType: ["Sick", "Casual", "Earned"][idx % 3],
+        fromDate: leaveDate,
+        toDate: leaveDate,
+        totalDays: 1,
+        reason: "Personal commitment or health reasons.",
+        status: ["Pending", "Approved", "Rejected"][idx % 3],
+        appliedOn: new Date(today.getTime() - 86400000 * 5),
+      };
+    });
+    
+    const insertedLeaves = await Leave.insertMany(leavePayload);
+    console.log(`Inserted ${insertedLeaves.length} leave references`);
+
     const admissionInquiries = await AdmissionInquiry.insertMany(buildAdmissionInquiries());
     console.log(`Inserted ${admissionInquiries.length} admissions inquiries`);
 
@@ -798,6 +938,77 @@ async function seed() {
 
     const certificateTemplates = await CertificateTemplate.insertMany(buildCertificateTemplates());
     console.log(`Inserted ${certificateTemplates.length} certificate/print templates`);
+
+    // ── Seed User Accounts ──────────────────────────────────────────────────
+    const DEFAULT_PASSWORD = "Admin@123";
+    const passwordHash = await bcrypt.hash(DEFAULT_PASSWORD, 12);
+
+    const usersPayload = [
+      {
+        name: "Super Administrator",
+        email: "superadmin@school.edu",
+        passwordHash,
+        role: "super_admin",
+        status: "Active",
+      },
+      {
+        name: "School Admin",
+        email: "admin@school.edu",
+        passwordHash,
+        role: "admin",
+        status: "Active",
+      },
+      {
+        name: "Accounts Office",
+        email: "accounts@school.edu",
+        passwordHash,
+        role: "accountant",
+        status: "Active",
+      },
+      {
+        name: teachers[0].name,
+        email: "teacher1@school.edu",
+        passwordHash,
+        role: "teacher",
+        linkedId: teachers[0]._id,
+        status: "Active",
+      },
+      {
+        name: teachers[1].name,
+        email: "teacher2@school.edu",
+        passwordHash,
+        role: "teacher",
+        linkedId: teachers[1]._id,
+        status: "Active",
+      },
+      {
+        name: students[0].parentName,
+        email: "parent1@school.edu",
+        passwordHash,
+        role: "parent",
+        linkedId: students[0]._id,
+        status: "Active",
+      },
+      {
+        name: students[1].parentName,
+        email: "parent2@school.edu",
+        passwordHash,
+        role: "parent",
+        linkedId: students[1]._id,
+        status: "Active",
+      },
+    ];
+
+    const seededUsers = await User.insertMany(usersPayload);
+    console.log(`Inserted ${seededUsers.length} user accounts`);
+    console.log("  All test accounts use password: Admin@123");
+    console.log("  superadmin@school.edu  → Super Admin");
+    console.log("  admin@school.edu       → Admin");
+    console.log("  accounts@school.edu    → Accountant");
+    console.log("  teacher1@school.edu    → Teacher (linked to teacher record)");
+    console.log("  teacher2@school.edu    → Teacher (linked to teacher record)");
+    console.log("  parent1@school.edu     → Parent (linked to student record)");
+    console.log("  parent2@school.edu     → Parent (linked to student record)");
 
     console.log("");
     console.log("School dataset ready:");

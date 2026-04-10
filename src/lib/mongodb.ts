@@ -17,6 +17,10 @@ import "@/models/Setting";
 import "@/models/CertificateTemplate";
 import "@/models/AdmissionInquiry";
 import "@/models/AdmissionApplication";
+import "@/models/User";
+import "@/models/Timetable";
+import "@/models/StaffAttendance";
+import "@/models/Leave";
 
 const DB_CONNECTION = process.env.DB_CONNECTION || process.env.MONGODB_URI || "";
 

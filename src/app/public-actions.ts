@@ -19,7 +19,10 @@ function readOptionalValue(formData: FormData, key: string) {
 }
 
 function getSafeSourcePath(value: string) {
-  return value === "/campus" ? "/campus" : "/admissions";
+  if (value === "/campus") return "/campus";
+  if (value === "/inquiry") return "/inquiry";
+  if (value === "/admission") return "/admission";
+  return "/admissions";
 }
 
 async function createAdmissionRecord(formData: FormData) {

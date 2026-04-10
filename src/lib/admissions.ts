@@ -11,7 +11,7 @@ export const ADMISSION_STATUSES = [
 ] as const;
 export type AdmissionStatus = (typeof ADMISSION_STATUSES)[number];
 
-export type AdmissionSourcePage = "admissions" | "campus";
+export type AdmissionSourcePage = "admissions" | "campus" | "admission" | "inquiry";
 
 export const ADMISSION_APPLICATION_STATUSES = [
   "Draft",

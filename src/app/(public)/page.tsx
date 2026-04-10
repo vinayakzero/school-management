@@ -1,163 +1,130 @@
+import Image from "next/image";
+import Link from "next/link";
 import type { Metadata } from "next";
-import CtaBand from "@/components/public/cta-band";
-import GalleryStrip from "@/components/public/gallery-strip";
-import ImageSplitSection from "@/components/public/image-split-section";
-import NarrativeGrid from "@/components/public/narrative-grid";
-import PublicHero from "@/components/public/public-hero";
-import SectionHeading from "@/components/public/section-heading";
-import StatBand from "@/components/public/stat-band";
-import { admissionsCta, campusVisitCta, imageAssetMap, publicPageHeroes, schoolProfile, type PublicSectionBlock } from "@/lib/public-site";
+import { Reveal } from "@/components/public/motion";
+import { BadgeRow, HeroImageCard, InlineArrowLink, SectionIntro, StickyMobileCta, ColorCard } from "@/components/public/site-primitives";
+import { admissionCta, homeHeroBadges, homeLearningCards, homeShapingCards, homeStats, inquiryCta, schoolProfile } from "@/lib/public-site-v2";
 
 export const metadata: Metadata = {
-  description: `${schoolProfile.name} public homepage concept focused on institutional storytelling, academics, and admissions.`,
+  description: `${schoolProfile.name} public homepage with the Edukids-inspired theme and admissions-ready actions.`,
 };
-
-const institutionalPillars: PublicSectionBlock[] = [
-  {
-    eyebrow: "Academic Character",
-    title: "Scholarly learning with visible structure",
-    description: "The homepage should communicate that classroom rigour, faculty presence, and intellectual discipline are central to school identity.",
-    icon: "book",
-  },
-  {
-    eyebrow: "Activity & Belonging",
-    title: "A campus that feels active all day",
-    description: "Student life is presented as purposeful activity: clubs, arts, athletics, and leadership all operating inside a clear institutional rhythm.",
-    icon: "spark",
-  },
-  {
-    eyebrow: "Future Readiness",
-    title: "Spaces that prepare students for what comes next",
-    description: "Learning environments, labs, libraries, and mentorship show the school as future-aware without drifting into vague claims.",
-    icon: "lightbulb",
-  },
-];
-
-const homeStats = [
-  {
-    value: 28,
-    suffix: "+",
-    label: "Years of institutional continuity",
-    description: "A placeholder proof point for long-term academic trust and established school culture.",
-  },
-  {
-    value: 12,
-    prefix: "1:",
-    label: "Mentor guidance ratio",
-    description: "Represents the close academic and pastoral attention the public site should imply.",
-  },
-  {
-    value: 40,
-    suffix: "+",
-    label: "Clubs and activity formats",
-    description: "Signals that student life extends beyond a timetable into a sustained culture of participation.",
-  },
-  {
-    value: 100,
-    suffix: "%",
-    label: "Admissions-first conversion readiness",
-    description: "Every major section should support inquiry, confidence, and the next step toward a campus visit.",
-  },
-];
 
 export default function HomePage() {
   return (
     <>
-      <PublicHero
-        {...publicPageHeroes.home}
-        size="full"
-        primaryCta={admissionsCta}
-        secondaryCta={campusVisitCta}
-      />
+      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
+        <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
+          <div className="sf-surface paper-grid relative overflow-hidden rounded-[2.8rem] border border-[var(--sf-line)]/70 px-6 py-8 shadow-[0_14px_30px_rgba(61,41,35,0.1)] sm:px-10 sm:py-10">
+            <Reveal preset="heroCaption">
+              <p className="text-center font-serif text-5xl leading-tight text-[var(--sf-cocoa)] sm:text-6xl lg:text-left">
+                Putting your child&apos;s Future
+                <br />
+                in great motion
+              </p>
+              <div className="mt-6 flex justify-center lg:justify-start">
+                <BadgeRow items={homeHeroBadges} />
+              </div>
+              <div className="mt-8 flex justify-center lg:justify-start">
+                <Link href={admissionCta.href} className="rounded-full bg-[var(--sf-orange)] px-7 py-3 text-sm font-semibold text-white shadow-[0_18px_45px_rgba(61,41,35,0.08)] transition hover:-translate-y-1">
+                  Start Learning
+                </Link>
+              </div>
+              <p className="mx-auto mt-8 max-w-md text-center text-base leading-7 text-[var(--sf-cocoa-soft)] lg:mx-0 lg:text-left">
+                We just don&apos;t give our students only lecture but real life experiences.
+              </p>
+            </Reveal>
 
-      <div className="relative z-10 -mt-10 space-y-24 pb-24">
-        <section className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-10">
-          <StatBand items={homeStats} />
-        </section>
+            <div className="mt-8 grid items-end gap-6 sm:grid-cols-2">
+              <div className="relative mx-auto w-full max-w-[250px] lg:mx-0">
+                <div className="absolute bottom-0 left-0 h-40 w-40 rounded-full bg-[color:rgba(77,183,107,0.85)]" />
+                <div className="relative overflow-hidden rounded-[2rem]">
+                  <Image src={schoolProfile.heroImage} alt="Student learning" width={300} height={380} className="h-[260px] w-full object-cover object-left-top" priority />
+                </div>
+              </div>
+              <div className="relative mx-auto w-full max-w-[250px] lg:mx-0 lg:justify-self-end">
+                <div className="absolute bottom-0 right-0 h-40 w-40 rounded-t-full rounded-b-[2rem] bg-[color:rgba(247,198,61,0.9)]" />
+                <div className="relative overflow-hidden rounded-[2rem]">
+                  <Image src={schoolProfile.heroImage} alt="Student smiling" width={300} height={380} className="h-[260px] w-full object-cover object-right-top" priority />
+                </div>
+              </div>
+            </div>
 
-        <section className="mx-auto max-w-7xl space-y-10 px-6 sm:px-8 lg:px-10">
-          <SectionHeading
-            eyebrow="Institutional Promise"
-            title="A first impression built on confidence, scholarship, and calm visual authority."
-            description="The homepage is not a brochure wall. It is a sequence of photographic scenes, disciplined typography, and precise motion cues that help families trust the institution quickly."
+            <div className="mt-10 grid overflow-hidden rounded-[2rem] bg-[var(--sf-cocoa)] text-white md:grid-cols-3">
+              {homeStats.map((stat) => (
+                <div key={stat.value} className="border-b border-white/10 px-6 py-6 md:border-b-0 md:border-r md:last:border-r-0">
+                  <p className="text-4xl font-semibold">{stat.value}</p>
+                  <p className="mt-3 text-sm font-semibold">{stat.label}</p>
+                  <p className="mt-1 text-xs uppercase tracking-[0.14em] text-white/65">{stat.description}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            <HeroImageCard />
+
+            <div className="sf-surface rounded-[2.5rem] border border-[var(--sf-line)]/70 p-6 shadow-[0_14px_30px_rgba(61,41,35,0.1)]">
+              <SectionIntro
+                eyebrow="We focus on one impactful lesson at a time"
+                title="Shaping the future of kids"
+                description="Short, visual course cards make the public side feel clear and parent-friendly."
+              />
+              <div className="mt-8 grid gap-4 sm:grid-cols-2">
+                {homeShapingCards.map((card) => (
+                  <div key={card.title} className="rounded-[1.5rem] bg-white p-4 shadow-[0_18px_45px_rgba(61,41,35,0.08)]">
+                    <p className="text-sm font-semibold text-[var(--sf-cocoa)]">{card.title}</p>
+                    <p className="mt-1 text-xs uppercase tracking-[0.14em] text-[var(--sf-cocoa-soft)]">{card.eyebrow}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+          <SectionIntro
+            eyebrow="Smart and clever kids"
+            title="Ready to fly high!"
+            description="Learn smartly with us. We teach one smart lesson at a time and keep the next action visible."
           />
-          <NarrativeGrid items={institutionalPillars} />
-        </section>
+          <Reveal className="lg:pb-2">
+            <InlineArrowLink href={admissionCta.href} label="Enroll Now" />
+          </Reveal>
+        </div>
 
-        <section className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-10">
-          <ImageSplitSection
-            eyebrow="Academic Depth"
-            title="The site should make knowledge work visible through classrooms, reading spaces, and mentor-led learning moments."
-            description="Rather than listing claims, the public frontend uses image-led sections to show what scholarship looks like on campus: concentrated learning, thoughtful spaces, and clear academic progression."
-            media={{
-              slotId: "library",
-              src: imageAssetMap.library.src,
-              alt: imageAssetMap.library.alt,
-            }}
-            points={[
-              "A curriculum story that feels rigorous without becoming cold or overloaded.",
-              "Large-format media framed by editorial text blocks and restrained interface chrome.",
-              "Messaging that reassures parents while still speaking to aspiration and future-readiness.",
-            ]}
-            cta={{ label: "Explore Academics", href: "/academics" }}
-          />
-        </section>
+        <div className="mt-8 grid gap-5 md:grid-cols-3">
+          {homeLearningCards.map((card) => (
+            <ColorCard key={card.title} card={card} />
+          ))}
+        </div>
+      </section>
 
-        <section className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-10">
-          <ImageSplitSection
-            eyebrow="Student Life"
-            title="Co-curricular culture is positioned as a disciplined extension of learning, not an afterthought."
-            description="Athletics, arts, clubs, and leadership spaces are shown as active and mentored environments where students build identity, confidence, and community."
-            media={{
-              slotId: "student-life-hero",
-              src: imageAssetMap["student-life-hero"].src,
-              alt: imageAssetMap["student-life-hero"].alt,
-            }}
-            reverse
-            points={[
-              "A gallery-led narrative makes the campus feel in motion without over-animating every surface.",
-              "The design keeps activity energetic but still formal enough to command as an institution.",
-              "The resulting tone is modern and alive, not playful or startup-like.",
-            ]}
-            cta={{ label: "View Student Life", href: "/student-life" }}
-          />
-        </section>
+      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:pb-16">
+        <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
+          <Reveal>
+            <div className="sf-card overflow-hidden bg-[var(--sf-yellow)] p-8 text-[var(--sf-cocoa)]">
+              <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[var(--sf-cocoa-soft)]">Confidence that builds a brighter future.</p>
+              <h3 className="mt-3 font-serif text-4xl leading-tight">Empower your kids to think smarter and sharper</h3>
+              <p className="mt-4 max-w-lg text-base leading-7 text-[var(--sf-cocoa-soft)]">
+                Encourage kids to think critically, be creative, and solve problems for a better future.
+              </p>
+              <Link href={inquiryCta.href} className="mt-6 inline-flex rounded-full bg-white px-6 py-3 text-sm font-semibold text-[var(--sf-cocoa)] shadow-[0_18px_45px_rgba(61,41,35,0.08)]">
+                Get Educated
+              </Link>
+            </div>
+          </Reveal>
 
-        <section className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-10">
-          <GalleryStrip
-            eyebrow="Visual Language"
-            title="Photographic storytelling should feel immersive, editorial, and easy to replace with real campus imagery later."
-            description="The placeholder media strategy is intentionally swap-ready: full-width hero images, sectional editorial frames, and a moving gallery band that keeps the site feeling alive."
-            images={[
-              {
-                title: "Campus movement",
-                src: imageAssetMap["home-hero"].src,
-                alt: imageAssetMap["home-hero"].alt,
-              },
-              {
-                title: "Collaborative culture",
-                src: imageAssetMap["about-culture"].src,
-                alt: imageAssetMap["about-culture"].alt,
-              },
-              {
-                title: "Knowledge spaces",
-                src: imageAssetMap.library.src,
-                alt: imageAssetMap.library.alt,
-              },
-            ]}
-          />
-        </section>
+          <Reveal>
+            <div className="sf-surface overflow-hidden rounded-[2.5rem] border border-[var(--sf-line)]/70 p-4 shadow-[0_14px_30px_rgba(61,41,35,0.1)]">
+              <Image src={schoolProfile.heroImage} alt="Happy student" width={900} height={520} className="h-[320px] w-full rounded-[2rem] object-cover object-center" />
+            </div>
+          </Reveal>
+        </div>
+      </section>
 
-        <section className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-10">
-          <CtaBand
-            eyebrow="Admissions First"
-            title="Families should always know the next step: understand the school, visit the campus, and begin the admissions journey."
-            description="This CTA pattern stays present across header, hero, content sections, and footer so the public frontend feels premium without losing conversion clarity."
-            primaryCta={admissionsCta}
-            secondaryCta={campusVisitCta}
-          />
-        </section>
-      </div>
+      <StickyMobileCta primary={admissionCta} secondary={inquiryCta} />
     </>
   );
 }

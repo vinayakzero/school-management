@@ -122,6 +122,111 @@
     background: linear-gradient(180deg, rgba(255, 253, 248, 0.9), rgba(248, 244, 235, 0.82));
     box-shadow: 0 28px 70px -42px rgba(15, 23, 42, 0.38);
   }
+
+  .site-shell {
+    --sf-cream: #f7f0e4;
+    --sf-paper: #fbf6ee;
+    --sf-cocoa: #3d2923;
+    --sf-cocoa-soft: #6d5249;
+    --sf-orange: #ff7b3d;
+    --sf-yellow: #f7c63d;
+    --sf-green: #4db76b;
+    --sf-blue: #5ba6e6;
+    --sf-line: #dfd2c2;
+  }
+
+  .site-shell.public-theme {
+    background:
+      radial-gradient(circle at top left, rgba(255, 184, 132, 0.12), transparent 24%),
+      radial-gradient(circle at top right, rgba(91, 166, 230, 0.12), transparent 22%),
+      var(--sf-cream);
+    color: var(--sf-cocoa);
+  }
+
+  .site-shell::before,
+  .site-shell::after {
+    content: "";
+    position: fixed;
+    z-index: -1;
+    border-radius: 999px;
+    pointer-events: none;
+    filter: blur(10px);
+    opacity: 0.55;
+  }
+
+  .site-shell::before {
+    top: 7rem;
+    left: -4rem;
+    width: 12rem;
+    height: 12rem;
+    background: rgba(77, 183, 107, 0.08);
+  }
+
+  .site-shell::after {
+    right: -3rem;
+    bottom: 7rem;
+    width: 10rem;
+    height: 10rem;
+    background: rgba(247, 198, 61, 0.08);
+  }
+
+  .top-band {
+    height: 1.75rem;
+    width: 100%;
+    background: var(--sf-cocoa);
+  }
+
+  .paper-grid {
+    background-image:
+      linear-gradient(rgba(223, 210, 194, 0.4) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(223, 210, 194, 0.4) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+
+  .sf-surface {
+    background: rgba(251, 246, 238, 0.92);
+  }
+
+  .sf-card {
+    border-radius: 2rem;
+    box-shadow: 0 14px 30px rgba(61, 41, 35, 0.1);
+  }
+
+  .hero-shape::before,
+  .hero-shape::after {
+    content: "";
+    position: absolute;
+    border-radius: 999px;
+    opacity: 0.55;
+  }
+
+  .hero-shape::before {
+    inset: auto auto 12% -13%;
+    width: 11rem;
+    height: 11rem;
+    background: rgba(77, 183, 107, 0.18);
+  }
+
+  .hero-shape::after {
+    inset: 10% -9% auto auto;
+    width: 8.5rem;
+    height: 8.5rem;
+    background: rgba(247, 198, 61, 0.24);
+  }
+
+  .focus-field {
+    transition:
+      border-color 0.25s ease,
+      box-shadow 0.25s ease,
+      background-color 0.25s ease;
+  }
+
+  .focus-field:focus {
+    border-color: rgba(255, 123, 61, 0.85);
+    box-shadow: 0 0 0 4px rgba(255, 123, 61, 0.14);
+    background: #fff;
+    outline: none;
+  }
 }
 
 @media (prefers-color-scheme: dark) {

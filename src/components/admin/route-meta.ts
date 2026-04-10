@@ -7,9 +7,11 @@ import {
   ClipboardList,
   FileText,
   GraduationCap,
+  Grid3x3,
   LayoutDashboard,
   School,
   Settings,
+  ShieldCheck,
   Users,
   Wallet,
 } from "lucide-react";
@@ -47,10 +49,28 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
     icon: GraduationCap,
   },
   {
+    href: "/admin/staff-attendance",
+    label: "Staff Attendance",
+    description: "Daily register, arrival times, and leave tracking.",
+    icon: ClipboardCheck,
+  },
+  {
+    href: "/admin/leaves",
+    label: "Leaves",
+    description: "Track and approve faculty leave applications.",
+    icon: CalendarDays,
+  },
+  {
     href: "/admin/classes",
     label: "Classes",
     description: "Grade-section structure and class teacher assignment.",
     icon: School,
+  },
+  {
+    href: "/admin/timetable",
+    label: "Timetable",
+    description: "Class schedules, period assignments, and conflict resolution.",
+    icon: Grid3x3,
   },
   {
     href: "/admin/subjects",
@@ -99,6 +119,12 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
     label: "Templates",
     description: "Certificates, reports, IDs, and print layouts.",
     icon: FileText,
+  },
+  {
+    href: "/admin/users",
+    label: "Users",
+    description: "Manage login accounts, roles, and access permissions.",
+    icon: ShieldCheck,
   },
   {
     href: "/admin/settings",
