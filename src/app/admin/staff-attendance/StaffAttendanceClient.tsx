@@ -2,13 +2,13 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { format, parseISO } from "date-fns";
-import { ClipboardList, Calendar, Save, ArrowLeft, ArrowRight, Loader2, Search } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { format } from "date-fns";
+import { Calendar, Save, ArrowLeft, ArrowRight, Loader2, Search } from "lucide-react";
 import { markStaffAttendanceAction } from "./actions";
 import { AdminPageHeader } from "@/components/admin/page-header";
 import { AdminSectionCard } from "@/components/admin/section-card";
 import { buttonVariants } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 
 const STATUS_OPTIONS = [
@@ -19,77 +19,98 @@ const STATUS_OPTIONS = [
   { value: "On Leave", label: "Leave", color: "text-blue-700 bg-blue-50 dark:text-blue-400 dark:bg-blue-950/30 border-blue-200" },
 ];
 
-export default function StaffAttendanceClient({ 
-  teachers, 
-  existingRecords, 
-  currentDateStr 
-}: { 
-  teachers: any[], 
-  existingRecords: any[], 
-  currentDateStr: string 
+export default function StaffAttendanceClient({
+  teachers,
+  existingRecords,
+  currentDateStr,
+}: {
+  teachers: any[];
+  existingRecords: any[];
+  currentDateStr: string;
 }) {
+  const router = useRouter();
   const [search, setSearch] = useState("");
   const [saving, setSaving] = useState(false);
-  
-  // Initialize state with existing records or default to "Present"
+  const [saveError, setSaveError] = useState("");
+  const [saveMessage, setSaveMessage] = useState("");
+
   const [attendanceState, setAttendanceState] = useState<Record<string, any>>(() => {
     const state: Record<string, any> = {};
-    const recordsByTeacherId = new Map(existingRecords.map(r => [r.teacherId, r]));
-    
-    teachers.forEach(t => {
-      const existing = recordsByTeacherId.get(t._id);
-      state[t._id] = {
-        teacherId: t._id,
+    const recordsByTeacherId = new Map(existingRecords.map((record) => [record.teacherId, record]));
+
+    teachers.forEach((teacher) => {
+      const existing = recordsByTeacherId.get(teacher._id);
+      state[teacher._id] = {
+        teacherId: teacher._id,
         status: existing ? existing.status : "Present",
         inTime: existing?.inTime || "08:00",
         outTime: existing?.outTime || "15:00",
         note: existing?.note || "",
       };
     });
+
     return state;
   });
 
-  const filteredTeachers = teachers.filter(t => 
-    t.name.toLowerCase().includes(search.toLowerCase()) || 
-    t.department?.toLowerCase().includes(search.toLowerCase()) ||
-    t.employeeCode?.toLowerCase().includes(search.toLowerCase())
+  const filteredTeachers = teachers.filter(
+    (teacher) =>
+      teacher.name.toLowerCase().includes(search.toLowerCase()) ||
+      teacher.department?.toLowerCase().includes(search.toLowerCase()) ||
+      teacher.employeeCode?.toLowerCase().includes(search.toLowerCase())
   );
 
+  const resetMessages = () => {
+    setSaveError("");
+    setSaveMessage("");
+  };
+
   const handleStatusChange = (teacherId: string, status: string) => {
-    setAttendanceState(prev => ({
+    resetMessages();
+    setAttendanceState((prev) => ({
       ...prev,
-      [teacherId]: { ...prev[teacherId], status }
+      [teacherId]: { ...prev[teacherId], status },
     }));
   };
 
   const handleTimeChange = (teacherId: string, field: "inTime" | "outTime", value: string) => {
-    setAttendanceState(prev => ({
+    resetMessages();
+    setAttendanceState((prev) => ({
       ...prev,
-      [teacherId]: { ...prev[teacherId], [field]: value }
+      [teacherId]: { ...prev[teacherId], [field]: value },
     }));
   };
 
   const handleNoteChange = (teacherId: string, value: string) => {
-    setAttendanceState(prev => ({
+    resetMessages();
+    setAttendanceState((prev) => ({
       ...prev,
-      [teacherId]: { ...prev[teacherId], note: value }
+      [teacherId]: { ...prev[teacherId], note: value },
     }));
   };
 
   const handleMarkAll = (status: string) => {
-    const newState = { ...attendanceState };
-    teachers.forEach(t => {
-      newState[t._id] = { ...newState[t._id], status };
+    resetMessages();
+    const nextState = { ...attendanceState };
+    teachers.forEach((teacher) => {
+      nextState[teacher._id] = { ...nextState[teacher._id], status };
     });
-    setAttendanceState(newState);
+    setAttendanceState(nextState);
   };
 
   const handleSave = async () => {
     setSaving(true);
-    const marks = Object.values(attendanceState);
-    await markStaffAttendanceAction(new Date(currentDateStr), marks);
+    resetMessages();
+
+    const result = await markStaffAttendanceAction(new Date(currentDateStr), Object.values(attendanceState));
+
     setSaving(false);
-    alert("Attendance saved successfully!");
+    if (!result.success) {
+      setSaveError(result.error || "Attendance could not be saved.");
+      return;
+    }
+
+    setSaveMessage("Attendance saved successfully.");
+    router.refresh();
   };
 
   const targetDate = new Date(currentDateStr);
@@ -128,7 +149,7 @@ export default function StaffAttendanceClient({
             <ArrowRight size={16} />
           </Link>
         </div>
-        
+
         <div className="flex items-center gap-3">
           <button onClick={() => handleMarkAll("Present")} className={buttonVariants({ variant: "outline", size: "sm" })}>
             Mark All Present
@@ -140,10 +161,17 @@ export default function StaffAttendanceClient({
         </div>
       </div>
 
-      <AdminSectionCard
-        title="Faculty Register"
-        description={`${filteredTeachers.length} staff members listed.`}
-      >
+      <AdminSectionCard title="Faculty Register" description={`${filteredTeachers.length} staff members listed.`}>
+        {saveError ? (
+          <div className="border-b border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700 dark:border-red-900/60 dark:bg-red-950/20 dark:text-red-300">
+            {saveError}
+          </div>
+        ) : null}
+        {saveMessage ? (
+          <div className="border-b border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700 dark:border-emerald-900/60 dark:bg-emerald-950/20 dark:text-emerald-300">
+            {saveMessage}
+          </div>
+        ) : null}
         <div className="flex flex-col items-center justify-between gap-4 border-b border-border/70 bg-muted/50 p-4 sm:flex-row">
           <div className="relative w-full sm:w-96">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -170,68 +198,72 @@ export default function StaffAttendanceClient({
             <tbody className="divide-y divide-border">
               {filteredTeachers.map((teacher) => {
                 const state = attendanceState[teacher._id];
-                
+
                 return (
                   <tr key={teacher._id} className="transition-colors hover:bg-muted/30">
                     <td className="px-6 py-4">
                       <div className="font-semibold text-foreground">{teacher.name}</div>
-                      <div className="text-xs text-muted-foreground">{teacher.employeeCode || "No Code"} • {teacher.department || teacher.subject}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {teacher.employeeCode || "No Code"} | {teacher.department || teacher.subject}
+                      </div>
                     </td>
-                    
+
                     <td className="px-6 py-4">
                       <div className="flex flex-wrap gap-2">
-                        {STATUS_OPTIONS.map(opt => {
-                          const isSelected = state.status === opt.value;
+                        {STATUS_OPTIONS.map((option) => {
+                          const isSelected = state.status === option.value;
                           return (
                             <button
-                              key={opt.value}
-                              onClick={() => handleStatusChange(teacher._id, opt.value)}
+                              key={option.value}
+                              onClick={() => handleStatusChange(teacher._id, option.value)}
                               className={`rounded-full border px-3 py-1.5 text-xs font-bold transition-all ${
-                                isSelected ? `${opt.color} shadow-sm ring-1 ring-inset ring-current` : "border-border bg-background text-muted-foreground hover:bg-muted"
+                                isSelected ? `${option.color} shadow-sm ring-1 ring-inset ring-current` : "border-border bg-background text-muted-foreground hover:bg-muted"
                               }`}
                             >
-                              {opt.label}
+                              {option.label}
                             </button>
                           );
                         })}
                       </div>
                     </td>
-                    
+
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
-                        <input 
-                          type="time" 
-                          value={state.inTime} 
+                        <input
+                          type="time"
+                          value={state.inTime}
                           onChange={(e) => handleTimeChange(teacher._id, "inTime", e.target.value)}
                           className="rounded-md border border-border bg-background px-2 py-1 text-xs outline-none focus:border-primary"
                         />
                         <span className="text-muted-foreground">-</span>
-                        <input 
-                          type="time" 
-                          value={state.outTime} 
+                        <input
+                          type="time"
+                          value={state.outTime}
                           onChange={(e) => handleTimeChange(teacher._id, "outTime", e.target.value)}
                           className="rounded-md border border-border bg-background px-2 py-1 text-xs outline-none focus:border-primary"
                         />
                       </div>
                     </td>
-                    
+
                     <td className="px-6 py-4 text-right">
-                       <input 
-                          type="text" 
-                          placeholder="Note..."
-                          value={state.note} 
-                          onChange={(e) => handleNoteChange(teacher._id, e.target.value)}
-                          className="w-full rounded-md border border-border bg-background px-3 py-1.5 text-xs outline-none focus:border-primary"
-                        />
+                      <input
+                        type="text"
+                        placeholder="Note..."
+                        value={state.note}
+                        onChange={(e) => handleNoteChange(teacher._id, e.target.value)}
+                        className="w-full rounded-md border border-border bg-background px-3 py-1.5 text-xs outline-none focus:border-primary"
+                      />
                     </td>
                   </tr>
                 );
               })}
-              {filteredTeachers.length === 0 && (
+              {filteredTeachers.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="p-8 text-center text-muted-foreground">No staff members found matching your search.</td>
+                  <td colSpan={4} className="p-8 text-center text-muted-foreground">
+                    No staff members found matching your search.
+                  </td>
                 </tr>
-              )}
+              ) : null}
             </tbody>
           </table>
         </div>

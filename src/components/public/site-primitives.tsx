@@ -62,7 +62,7 @@ export function TestimonialPanel({ item }: { item: TestimonialItem }) {
         <div className={cn("sf-card h-full p-6 text-white", colorClassName(item.color))}>
           <p className="text-sm font-semibold uppercase tracking-[0.16em] text-white/85">Parent voice</p>
           <h3 className="mt-3 font-serif text-3xl">{item.title}</h3>
-          <p className="mt-4 text-sm leading-7 text-white/85">"{item.quote}"</p>
+          <p className="mt-4 text-sm leading-7 text-white/85">&ldquo;{item.quote}&rdquo;</p>
         </div>
       </HoverCard>
     </Reveal>

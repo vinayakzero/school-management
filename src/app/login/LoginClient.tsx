@@ -57,6 +57,7 @@ export default function LoginClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const errorParam = searchParams.get("error");
+  const showQuickLogin = process.env.NODE_ENV !== "production";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -65,7 +66,7 @@ export default function LoginClient() {
   const [quickLoading, setQuickLoading] = useState<string | null>(null);
   const [error, setError] = useState(
     errorParam === "unauthorized"
-      ? "Your account doesn't have permission to access the admin panel."
+      ? "Your account is signed in, but the admin portal is not available for this role yet."
       : errorParam === "CredentialsSignin"
       ? "Invalid email or password. Please try again."
       : ""
@@ -244,7 +245,7 @@ export default function LoginClient() {
           </form>
 
           {/* Test Quick Login — Dev Only */}
-          <div className="mt-10">
+          {showQuickLogin ? <div className="mt-10">
             <div className="flex items-center gap-3">
               <div className="h-px flex-1 bg-border" />
               <span className="rounded-full border border-amber-300 bg-amber-50 px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-amber-700 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-400">
@@ -282,7 +283,7 @@ export default function LoginClient() {
             <p className="mt-4 text-center text-[11px] text-muted-foreground/60">
               All test accounts use password: <code className="font-mono">Admin@123</code>
             </p>
-          </div>
+          </div> : null}
         </div>
       </div>
     </div>

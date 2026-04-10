@@ -1,9 +1,18 @@
 import connectDB from "@/lib/mongodb";
 import Leave from "@/models/Leave";
 import Teacher from "@/models/Teacher";
-import User from "@/models/User";
 import { notFound } from "next/navigation";
 import LeaveProcessClient from "./LeaveProcessClient";
+
+type PopulatedApplicant = {
+  name?: string;
+  employeeCode?: string;
+  department?: string;
+};
+
+type PopulatedApprover = {
+  name?: string;
+};
 
 export default async function LeaveProcessPage({ params }: { params: { id: string } }) {
   await connectDB();
@@ -18,14 +27,19 @@ export default async function LeaveProcessPage({ params }: { params: { id: strin
 
   if (!leaveRaw) notFound();
 
+  const applicant = leaveRaw.applicantId as PopulatedApplicant | null;
+  const approvedBy = leaveRaw.approvedBy as PopulatedApprover | null;
+
   const leave = {
     _id: leaveRaw._id.toString(),
     applicantType: leaveRaw.applicantType,
-    applicant: leaveRaw.applicantId ? { 
-      name: leaveRaw.applicantId.name, 
-      employeeCode: leaveRaw.applicantId.employeeCode,
-      department: leaveRaw.applicantId.department 
-    } : null,
+    applicant: applicant
+      ? {
+          name: applicant.name || "Unknown applicant",
+          employeeCode: applicant.employeeCode || "",
+          department: applicant.department || "",
+        }
+      : null,
     leaveType: leaveRaw.leaveType,
     fromDate: leaveRaw.fromDate.toISOString(),
     toDate: leaveRaw.toDate.toISOString(),
@@ -33,8 +47,9 @@ export default async function LeaveProcessPage({ params }: { params: { id: strin
     reason: leaveRaw.reason,
     status: leaveRaw.status,
     approvalNote: leaveRaw.approvalNote,
-    approvedBy: leaveRaw.approvedBy ? leaveRaw.approvedBy.name : null,
+    approvedBy: approvedBy?.name || null,
     appliedOn: leaveRaw.appliedOn.toISOString(),
+    updatedAt: leaveRaw.updatedAt.toISOString(),
   };
 
   return <LeaveProcessClient leave={leave} />;

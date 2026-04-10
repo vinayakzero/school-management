@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ShieldCheck, Search, Edit2, Trash2, UserX, Users } from "lucide-react";
-import { deleteUserAction, deactivateUserAction } from "./actions";
+import { ShieldCheck, Search, Edit2, UserX, Users } from "lucide-react";
+import { deactivateUserAction } from "./actions";
 import { AdminPageHeader } from "@/components/admin/page-header";
 import { AdminSectionCard } from "@/components/admin/section-card";
 import { AdminEmptyState } from "@/components/admin/empty-state";
@@ -42,14 +42,6 @@ export default function UsersClient({ users: initialUsers }: { users: any[] }) {
     setLoadingId(null);
   };
 
-  const handleDelete = async (id: string, name: string) => {
-    if (!confirm(`Permanently delete user "${name}"? This cannot be undone.`)) return;
-    setLoadingId(id);
-    await deleteUserAction(id);
-    setUsers((prev) => prev.filter((u) => u._id !== id));
-    setLoadingId(null);
-  };
-
   return (
     <div className="space-y-6">
       <AdminPageHeader
@@ -65,7 +57,7 @@ export default function UsersClient({ users: initialUsers }: { users: any[] }) {
 
       <AdminSectionCard
         title="All Users"
-        description="Search by name, email, or role. Click Edit to update credentials or reset passwords."
+        description="Search by name, email, or role. Click Edit to update credentials or reset passwords. Deactivation is soft and preserves audit history."
       >
         <div className="flex flex-col items-center justify-between gap-4 border-b border-border/70 bg-muted/50 p-4 sm:flex-row">
           <div className="relative w-full sm:w-96">
@@ -152,14 +144,6 @@ export default function UsersClient({ users: initialUsers }: { users: any[] }) {
                             <UserX size={16} className="text-amber-600 dark:text-amber-400" />
                           </button>
                         )}
-                        <button
-                          onClick={() => handleDelete(user._id, user.name)}
-                          disabled={loadingId === user._id}
-                          className={buttonVariants({ variant: "ghost", size: "icon" })}
-                          title="Delete"
-                        >
-                          <Trash2 size={16} className="text-red-600 dark:text-red-400" />
-                        </button>
                       </div>
                     </TableCell>
                   </TableRow>

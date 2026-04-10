@@ -12,7 +12,12 @@ export const metadata: Metadata = {
 
 export default async function LoginPage() {
   const session = await getServerSession(authOptions);
-  if (session) redirect("/admin");
+  const role = (session?.user as any)?.role;
+  const adminRoles = ["super_admin", "admin", "accountant", "teacher"];
+
+  if (session && adminRoles.includes(role)) {
+    redirect("/admin");
+  }
 
   return (
     <Suspense>
