@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Edit2, Trash2, Plus, Clock, MapPin, Search } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Edit2, Trash2, Plus, Clock, MapPin } from "lucide-react";
 import { deleteTimetableEntryAction } from "../../actions";
 import { buttonVariants } from "@/components/ui/button";
 
@@ -11,14 +12,23 @@ const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
 const PERIODS = [1, 2, 3, 4, 5, 6, 7, 8];
 
 export default function TimetableGridClient({ entries, classId }: { entries: any[], classId: string }) {
+  const router = useRouter();
   const [loadingId, setLoadingId] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState("");
 
   const handleDelete = async (id: string) => {
     if (!confirm("Remove this period from the timetable?")) return;
+    setDeleteError("");
     setLoadingId(id);
-    await deleteTimetableEntryAction(id);
-    // the server action calls revalidatePath, which will refresh the prop data automatically
+    const result = await deleteTimetableEntryAction(id);
     setLoadingId(null);
+
+    if (!result.success) {
+      setDeleteError(result.error || "This timetable entry could not be removed.");
+      return;
+    }
+
+    router.refresh();
   };
 
   // Helper to find the entry for a specific day and period
@@ -28,6 +38,11 @@ export default function TimetableGridClient({ entries, classId }: { entries: any
 
   return (
     <div className="overflow-x-auto pb-4">
+      {deleteError ? (
+        <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700 dark:border-red-900/60 dark:bg-red-950/20 dark:text-red-300">
+          {deleteError}
+        </div>
+      ) : null}
       <div className="mb-4 flex justify-end">
         <button className={buttonVariants({ variant: "outline", size: "sm" })} onClick={() => window.print()} type="button">
           Print Timetable

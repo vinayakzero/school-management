@@ -64,12 +64,5 @@ export async function deactivateUserAction(id: string) {
 }
 
 export async function deleteUserAction(id: string) {
-  try {
-    await connectDB();
-    await User.findByIdAndDelete(id);
-    revalidatePath("/admin/users");
-    return { success: true };
-  } catch (error: any) {
-    return { success: false, error: error.message };
-  }
+  return deactivateUserAction(id);
 }

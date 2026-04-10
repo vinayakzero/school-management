@@ -4,7 +4,11 @@ import Subject from "@/models/Subject";
 import Teacher from "@/models/Teacher";
 import TimetableForm from "../TimetableForm";
 
-export default async function NewTimetablePeriodPage({ searchParams }: { searchParams: { classId?: string } }) {
+export default async function NewTimetablePeriodPage({
+  searchParams,
+}: {
+  searchParams: { classId?: string; day?: string; period?: string };
+}) {
   await connectDB();
   
   const classesRaw = await ClassModel.find().lean();
@@ -30,8 +34,14 @@ export default async function NewTimetablePeriodPage({ searchParams }: { searchP
     subject: t.subject,
   }));
 
-  // If a classId was passed via query parameter, pre-fill it
-  const initialEntry = searchParams.classId ? { classId: searchParams.classId } : undefined;
+  const initialEntry =
+    searchParams.classId || searchParams.day || searchParams.period
+      ? {
+          classId: searchParams.classId,
+          day: searchParams.day,
+          periodNumber: searchParams.period ? Number.parseInt(searchParams.period, 10) : undefined,
+        }
+      : undefined;
 
   return (
     <TimetableForm 
